@@ -1,8 +1,8 @@
 import re
 
-search_regx = re.compile("SELECT(?: )+(.+)(?: )+FROM(?: )+(\w+)?((?: )+INNER JOIN(?: )+(\w+))?((?: )+WHERE(?: )+(\w+|\w+.\w+)(?: *)?=(?: *)?(\w+|'.+'|\w+.\w+)((?: )+(AND|OR)(?: )+(\w+|\w+.\w+)( *)?=(?: *)?(\w+|'.+'|\w+.\w+))*)?((?: )+ORDER BY(?: )+(\w+|\w+.\w+)(?: )+(ASC|DESC))?;")
-insert_regx = re.compile("INSERT INTO(?: )+(\w+)(?: )+\((?: *)?(\w+|\w+.\w+)((?: *)?,(?: *)?(\w+|\w+.\w+))*(?: *)?\)(?: )+VALUES(?: )+\((?: *)?(\w+|\w+.\w+)((?: *)?,(?: *)?(\w+|\w+.\w+))*(?: *)?\);")
-update_regx = re.compile("UPDATE(?: )+(\w+)(?: )+SET(?: )+(\w+|\w+.\w+)(?: *)?=(?: *)?(\w+|'.+'|\w+.\w+)((?: *)?,(?: *)?(\w+|\w+.\w+)(?: *)?=(?: *)?(\w+|'.+'|\w+.\w+))*(?: )+WHERE(?: )+(\w+|\w+.\w+)(?: *)?=(?: *)?(\w+|'.+'|\w+.\w+)((?: )+(AND|OR)(?: )+(\w+|\w+.\w+)(?: *)?=(?: *)?(\w+|'.+'|\w+.\w+))*;")
+search_regx = re.compile(r"(SELECT)(?: +)(.+)(?: +)(FROM)(?: +)(\w+)?(?:(?: +)(INNER JOIN)(?: +)(\w+))?(?:(?: +)(WHERE)(?: +)(.+?))?(?:(?: +)(ORDER BY)(?: +)(\w+|\w+.\w+)(?: +)(ASC|DESC))?;")
+insert_regx = re.compile(r"(INSERT INTO)(?: +)(.+)(?: +)\((?: *)?(.+)(?: *)?\)(?: +)(VALUES)(?: +)\((?: *)?(.*)(?: *)?\);")
+update_regx = re.compile(r"(UPDATE)(?: +)(.+)(?: +)(SET)(?: +)(.+)(?: +)(WHERE)(?: +)(.+);")
 
 
 def search():
@@ -36,12 +36,23 @@ while running:
         print("Search command.")
         print(search_match.groups())
     elif insert_match:
-        print("Insert command.")
-        print(insert_match.groups())
+        tabla = insert_match[2]
+
+        keys = insert_match[3].strip().split(",");
+        keys = list(map(lambda str: str.strip(" '"), keys))
+
+        values = insert_match[5].strip().split(",")
+        values = list(map(lambda str: str.strip(" '"), values))
+        
+        if len(keys) != len(values):
+            print("Error de Sintaxis!")
+        else:
+            fila_dat = dict(zip(keys,values))
+            #insert(tabla, fila_dat)
     elif update_match:
         print("Update command.")
         print(update_match.groups())
-    elif query == "EXIT":
+    elif query == "EXIT;":
         running = False
     else:
         print("Error de Sintaxis!")
