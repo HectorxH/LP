@@ -1,8 +1,9 @@
 import re
+from pprint import pprint as pp
 
-search_regx = re.compile(r"(SELECT)(?: +)((?:[\w\*]+)(?:(?: *),(?: *)(?:\w+))*)(?: +)(FROM)(?: +)(\w+)(?:(?: +)(INNER JOIN)(?: +)(\w+))?(?:(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*'))*))?(?:(?: +)(ORDER BY)(?: +)(\w+|\w+\.\w+)(?: +)(ASC|DESC))?;$")
-insert_regx = re.compile(r"(INSERT INTO)(?: +)(\w+)(?: +)\((?: *)((?:\w+)(?:(?: *),(?: *)(?:\w+))*)(?: *)\)(?: +)(VALUES)(?: +)\((?: *)((?:\w+|\w+\.\w+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+|'.*'))*)(?: *)\);$")
-update_regx = re.compile(r"(UPDATE)(?: +)(\w+)(?: +)(SET)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*)(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*);$")
+select_regex = re.compile(r"(SELECT)(?: +)((?:[\w\*]+)(?:(?: *),(?: *)(?:\w+))*)(?: +)(FROM)(?: +)(\w+)(?:(?: +)(INNER JOIN)(?: +)(\w+))?(?:(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*'))*))?(?:(?: +)(ORDER BY)(?: +)(\w+|\w+\.\w+)(?: +)(ASC|DESC))?;$")
+insert_regex = re.compile(r"(INSERT INTO)(?: +)(\w+)(?: +)\((?: *)((?:\w+)(?:(?: *),(?: *)(?:\w+))*)(?: *)\)(?: +)(VALUES)(?: +)\((?: *)((?:\w+|\w+\.\w+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+|'.*'))*)(?: *)\);$")
+update_regex = re.compile(r"(UPDATE)(?: +)(\w+)(?: +)(SET)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*)(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*);$")
 
 def comaSplit(str):
     return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n'"))
@@ -18,6 +19,7 @@ def equalSplit(str):
 
 def check(subexpr, cols):
     (A, B) = equalSplit(subexpr)
+
     pos = cols.index(A)
     return lambda linea: linea[pos] == B;
 
@@ -31,50 +33,80 @@ def stmtToBool(stmt, cols):
     stmt = [exprToBool(expr, cols) for expr in stmt]
     return lambda linea: any([expr(linea) for expr in stmt])
 
-def search():
-    
+def select(match):
+    select = comaSplit(match[2])
+    table = match[4]
+    inner = match[6]
+    where = match[8]
+    order_by = match[10]
+    order_type = match[11]
 
-    return
+    if not inner:
+        out = []
+        cols = []
+        with open(table+".csv", "r") as file:
+            cols = file.readline().strip().split(",")
+            stmt = stmtToBool(where, cols) if where else lambda *_: True
+            for line in file:
+                line = line.strip().split(",")
+                if stmt(line):
+                    out.append(line)
+    else:
 
-def insert(tabla, fila_dat):
-    f1 = open(tabla+".csv", "r")
-    linea = f1.readline()
-    l1 = linea.strip().split(",")
-    f1.close()
+
+    select = range(len(cols)) if select is "*" else list(map(lambda col: cols.index(col), select))
+    if order_by:
+        i = cols.index(order_by)
+        out = sorted(out, key=lambda l: l[i])
+        if order_type == "DESC":
+            out = reversed(out)
+
+    for line in out:
+        string = ""
+        for col in select:
+            string = string + line[col] + "   "
+        string = string[:-1]
+        print(string)
+
+
+
+def insert(table, row_dat):
+    cols = ""
+    with open(table+".csv", "r") as file:
+        cols = file.readline().strip().split(",")
 
     string = ""
-    f2 = open(tabla+".csv", "a")
-    for rotulo in l1:
-        if rotulo in fila_dat:
-            string = string+fila_dat[rotulo] + ", "
-    string = string[:-2]+"\n"
+    with open(table+".csv", "a") as file:
+        for col in cols:
+            if col in row_dat:
+                string = string + row_dat[col] + ","
+            else:
+                string = string + "" + ","
+        string = string[:-1] + "\n"
 
-    f2.write(string)
-    f2.close()
+        file.write(string)
 
     print("Se ha insertado 1 fila.")
 
 def update(table, set, stmt):
     count = 0
 
-    file = open(table+".csv", "r")
-    lines = file.read().splitlines()
-    file.close()
+    with open(table+".csv", "r") as file:
+        lines = file.read().splitlines()
 
-    file = open(table+".csv", "w")
+    with open(table+".csv", "w") as file:
+        cols = lines[0].strip().split(",")
+        set[0] = cols.index(set[0])
+        stmt = stmtToBool(stmt, cols)
 
-    cols = lines[0].strip().split(",")
-    set[0] = cols.index(set[0])
-    stmt = stmtToBool(stmt, cols)
+        for line in lines:
+            line = line.strip().split(",")
+            if stmt(line):
+                line[set[0]] = set[1]
+                count += 1
+            line = ",".join(line)+"\n"
+            file.write(line)
 
-    for line in lines:
-        line = line.strip().split(",")
-        if stmt(line):
-            line[set[0]] = set[1]
-            count += 1
-        line = ",".join(line)+"\n"
-        file.write(line)
-    file.close()
     if count == 0:
         print("No se han actualizado filas.")
     elif count == 1:
@@ -86,33 +118,32 @@ running = True
 while running:
     query = str(input("Ingrese su query: "))
 
-    search_match = re.fullmatch(search_regx, query)
-    insert_match = re.fullmatch(insert_regx, query)
-    update_match = re.fullmatch(update_regx, query)
+    select_match = re.fullmatch(select_regex, query)
+    insert_match = re.fullmatch(insert_regex, query)
+    update_match = re.fullmatch(update_regex, query)
 
-    if search_match:
-        if search_match[5] and not search_match[7]:
+    if select_match:
+        if select_match[5] and not select_match[7]:
             print("Error de Sintaxis!")
         else:
-            print("Search command.")
-            print(search_match.groups())
+            select(select_match)
     elif insert_match:
-        tabla = insert_match[2]
+        table = insert_match[2]
         keys = comaSplit(insert_match[3])
         values = comaSplit(insert_match[5])
 
         if len(keys) != len(values):
             print("Error de Sintaxis!")
         else:
-            fila_dat = dict(zip(keys,values))
-            print(fila_dat)
-            insert(tabla, fila_dat)
+            row_dat = dict(zip(keys,values))
+            print(row_dat)
+            insert(table, row_dat)
 
     elif update_match:
-        tabla = update_match[2]
+        table = update_match[2]
         set = equalSplit(update_match[4])
         stmt = update_match[6]
-        update(tabla, set, stmt)
+        update(table, set, stmt)
 
     elif query == "EXIT;":
         running = False
