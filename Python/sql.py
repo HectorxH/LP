@@ -71,6 +71,7 @@ def select(match):
 
 def insert(table, row_dat):
     cols = ""
+    contador = 0
     with open(table+".csv", "r", encoding='utf8') as file:
         cols = file.readline().strip().split(",")
 
@@ -79,9 +80,13 @@ def insert(table, row_dat):
         for col in cols:
             if col in row_dat:
                 string = string + row_dat[col] + ","
+                contador+=1
             else:
                 string = string + "" + ","
         string = string[:-1] + "\n"
+
+        if len(row_dat) > contador:
+            print("Error de Sintaxis!")
 
         file.write(string)
 
