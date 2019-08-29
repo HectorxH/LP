@@ -43,13 +43,18 @@ def select(match):
     if not inner:
         out = []
         cols = []
-        with open(table+".csv", "r", encoding='utf8') as file:
-            cols = file.readline().strip().split(",")
-            stmt = stmtToBool(where, cols) if where else lambda *_: True
-            for line in file:
-                line = line.strip().split(",")
-                if stmt(line):
-                    out.append(line)
+        try:
+            file = open(table+".csv", "r", encoding='utf8');
+        except FileNotFoundError:
+            print("La tabla solicitada no existe.")
+        else:
+            with file:
+                cols = file.readline().strip().split(",")
+                stmt = stmtToBool(where, cols) if where else lambda *_: True
+                for line in file:
+                    line = line.strip().split(",")
+                    if stmt(line):
+                        out.append(line)
     else:
         return print("f uwu")
 
@@ -72,10 +77,17 @@ def select(match):
 def insert(table, row_dat):
     cols = ""
     contador = 0
-    with open(table+".csv", "r", encoding='utf8') as file:
-        cols = file.readline().strip().split(",")
+
+    try:
+        file = open(table+".csv", "r", encoding='utf8')
+    except FileNotFoundError:
+        print("La tabla solicitada no existe.")
+    else:
+        with file:
+            cols = file.readline().strip().split(",")
 
     string = ""
+
     with open(table+".csv", "a", encoding='utf8') as file:
         for col in cols:
             if col in row_dat:
@@ -95,8 +107,13 @@ def insert(table, row_dat):
 def update(table, set, stmt):
     count = 0
 
-    with open(table+".csv", "r", encoding='utf8') as file:
-        lines = file.read().splitlines()
+    try:
+        file = open(table+".csv", "r", encoding='utf8')
+    except FileNotFoundError:
+        print("La tabla solicitada no existe.")
+    else:
+        with file:
+            lines = file.read().splitlines()
 
     with open(table+".csv", "w", encoding='utf8') as file:
         cols = lines[0].strip().split(",")
