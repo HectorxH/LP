@@ -1,25 +1,24 @@
 import re
 from pprint import pprint as pp
 
-select_regex = re.compile(r"(SELECT)(?: +)((?:[\w\*]+)(?:(?: *),(?: *)(?:\w+))*)(?: +)(FROM)(?: +)(\w+)(?:(?: +)(INNER JOIN)(?: +)(\w+))?(?:(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\w+|\w+\.\w+|'.*'))*))?(?:(?: +)(ORDER BY)(?: +)(\w+|\w+\.\w+)(?: +)(ASC|DESC))?;$")
-insert_regex = re.compile(r"(INSERT INTO)(?: +)(\w+)(?: +)\((?: *)((?:\w+)(?:(?: *),(?: *)(?:\w+))*)(?: *)\)(?: +)(VALUES)(?: +)\((?: *)((?:\w+|\w+\.\w+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+|'.*'))*)(?: *)\);$")
-update_regex = re.compile(r"(UPDATE)(?: +)(\w+)(?: +)(SET)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: *),(?: *)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*)(?: +)(WHERE)(?: +)((?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*')(?:(?: +)(?:AND|OR)(?: +)(?:\w+|\w+\.\w+)(?: *)=(?: *)(?:\d+|\d+\.\d+|'.*'))*);$")
+select_regex = re.compile(r"^(SELECT) +([^\/:?\"<>|]+?(?: *, *.+?)*) +(FROM) +(.+?)(?: +(INNER JOIN) +(.+?))?(?: +(WHERE) +(.+?(?:\..+?)? *= *(?:.+?(?:\..+?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +.+?(?:\..+?)? *= *(?:.+?(?:\..+?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?(?: +(ORDER BY) +(.+?(?:\..+?)?) +(ASC|DESC))?;$")
+insert_regex = re.compile(r"^(INSERT INTO) +(.+?) +\( *(.+?(?: *, *.+?)*) *\) +(VALUES) +\( *((?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *(?:-?\d+(?:\.\d+)?|'[^']*'))*) *\);$")
+update_regex = re.compile(r"^(UPDATE) +(.+?) +(SET) +(.+?(?:\..+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *.+?(?:\..+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +(WHERE) +(.+?(?:\..+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +.+?(?:\..+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
 def comaSplit(str):
-    return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n'"))
+    return re.split(r"(?:'|\")?(?: *),(?: *)(?:'|\")?", str.strip(" \n\'\""))
 
 def orSplit(str):
-    return re.split(r"'?(?: *)OR(?: *)'?", str.strip(" \n'"))
+    return re.split(r"(?:'|\")?(?: +)OR(?: +)(?:'|\")?", str.strip(" \n\'\""))
 
 def andSplit(str):
-    return re.split(r"'?(?: *)AND(?: *)'?", str.strip(" \n'"))
+    return re.split(r"(?:'|\")?(?: +)AND(?: +)(?:'|\")?", str.strip(" \n\'\""))
 
 def equalSplit(str):
-    return re.split(r"'?(?: *)=(?: *)'?", str.strip(" \n'"))
+    return re.split(r"(?:'|\")?(?: *)=(?: *)(?:'|\")?", str.strip(" \n\'\""))
 
 def check(subexpr, cols):
     (A, B) = equalSplit(subexpr)
-
     pos = cols.index(A)
     return lambda linea: linea[pos] == B;
 
@@ -44,7 +43,7 @@ def select(match):
     if not inner:
         out = []
         cols = []
-        with open(table+".csv", "r") as file:
+        with open(table+".csv", "r", encoding='utf8') as file:
             cols = file.readline().strip().split(",")
             stmt = stmtToBool(where, cols) if where else lambda *_: True
             for line in file:
@@ -52,9 +51,9 @@ def select(match):
                 if stmt(line):
                     out.append(line)
     else:
+        return print("f uwu")
 
-
-    select = range(len(cols)) if select is "*" else list(map(lambda col: cols.index(col), select))
+    select = range(len(cols)) if "*" in select else list(map(lambda col: cols.index(col), select))
     if order_by:
         i = cols.index(order_by)
         out = sorted(out, key=lambda l: l[i])
@@ -72,11 +71,11 @@ def select(match):
 
 def insert(table, row_dat):
     cols = ""
-    with open(table+".csv", "r") as file:
+    with open(table+".csv", "r", encoding='utf8') as file:
         cols = file.readline().strip().split(",")
 
     string = ""
-    with open(table+".csv", "a") as file:
+    with open(table+".csv", "a", encoding='utf8') as file:
         for col in cols:
             if col in row_dat:
                 string = string + row_dat[col] + ","
@@ -91,10 +90,10 @@ def insert(table, row_dat):
 def update(table, set, stmt):
     count = 0
 
-    with open(table+".csv", "r") as file:
+    with open(table+".csv", "r", encoding='utf8') as file:
         lines = file.read().splitlines()
 
-    with open(table+".csv", "w") as file:
+    with open(table+".csv", "w", encoding='utf8') as file:
         cols = lines[0].strip().split(",")
         set[0] = cols.index(set[0])
         stmt = stmtToBool(stmt, cols)
