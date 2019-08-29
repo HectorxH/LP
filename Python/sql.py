@@ -86,9 +86,9 @@ def insert(table, row_dat):
         string = string[:-1] + "\n"
 
         if len(row_dat) > contador:
-            print("Error de Sintaxis!")
-
-        file.write(string)
+            print("No se pudo ingresar uno de los datos ya que no existe su columna respectiva.")
+        else:
+            file.write(string)
 
     print("Se ha insertado 1 fila.")
 
