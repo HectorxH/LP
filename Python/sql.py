@@ -384,7 +384,6 @@ while running:
             print("Error de Sintaxis!")
         else:
             row_dat = dict(zip(keys,values))
-            print(row_dat)
             insert(table, row_dat)
 
     elif update_match:
