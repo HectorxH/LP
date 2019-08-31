@@ -16,30 +16,210 @@ update_regex = re.compile(
     r"(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
 def comaSplit(str):
-    return re.split(r"(?:'|\")?(?: *),(?: *)(?:'|\")?", str.strip(" \n\'\""))
+    return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n\'"))
 
 def orSplit(str):
-    return re.split(r"(?:'|\")?(?: +)OR(?: +)(?:'|\")?", str.strip(" \n\'\""))
+    return re.split(r"'?(?: +)OR(?: +)'?", str.strip(" \n\'"))
 
 def andSplit(str):
-    return re.split(r"(?:'|\")?(?: +)AND(?: +)(?:'|\")?", str.strip(" \n\'\""))
+    return re.split(r"'?(?: +)AND(?: +)'?", str.strip(" \n\'"))
 
 def equalSplit(str):
-    return re.split(r"(?:'|\")?(?: *)=(?: *)(?:'|\")?", str.strip(" \n\'\""))
+    return re.split(r"'?(?: *)=(?: *)'?", str.strip(" \n\'"))
 
-def check(subexpr, cols):
-    (A, B) = equalSplit(subexpr)
-    pos = cols.index(A)
-    return lambda linea: linea[pos] == B;
+def equalSplitVar(str):
+    return re.split(r"(?: *)=(?: *)", str.strip())
 
-def exprToBool(expr, cols):
+def hasTableName(str):
+    return '.' in str
+
+def isColumn(str):
+    return all(not c.isnumeric() and c is not '\'' for c in str)
+
+def isString(str):
+    return '\'' in str
+
+
+def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
+    (A, B) = equalSplitVar(subexpr)
+
+    if not cols2:
+        try:
+            pos = cols1.index(A)
+        except ValueError:
+            print("Una columna solicitada en WHERE no existe.")
+            return False
+        return lambda row: row[pos] == B;
+    else:
+        if hasTableName(A):
+            (tableA, colA) = A.split('.')
+            if isColumn(B):
+                if hasTableName(B):
+                    (tableB, colB) = B.split('.')
+                    if tableA == table1 and tableB == table1:
+                        try:
+                            posA = cols1.index(colA)
+                            posB = cols1.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        return lambda row1, row2: row1[posA] == row1[posB]
+                    elif tableA == table1 and tableB == table2:
+                        try:
+                            posA = cols1.index(colA)
+                            posB = cols2.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        return lambda row1, row2: row1[posA] == row2[posB]
+                    elif tableA == table2 and tableB == table1:
+                        try:
+                            posA = cols2.index(colA)
+                            posB = cols1.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        return lambda row1, row2: row2[posA] == row1[posB]
+                    elif tableA == table2 and tableB == table2:
+                        try:
+                            posA = cols2.index(colA)
+                            posB = cols2.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        return lambda row1, row2: row2[posA] == row2[posB]
+                    else:
+                        print("Una tabla indicada en WHERE no existe.")
+                        return False
+                else:
+                    if tableA == table1:
+                        try:
+                            posA = cols1.index(colA)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        try:
+                            posB = cols1.index(colB)
+                            return lambda row1, row2: row1[posA] == row1[posB]
+                        except ValueError:
+                            try:
+                                posB = cols2.index(colB)
+                                return lambda row1, row2: row1[posA] == row2[posB]
+                            except ValueError:
+                                print("Una columna solicitada en WHERE no existe.")
+                                return False
+                    elif tableA == table2:
+                        try:
+                            posA = cols2.index(colA)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        try:
+                            posB = cols1.index(colB)
+                            return lambda row1, row2: row2[posA] == row1[posB]
+                        except ValueError:
+                            try:
+                                posB = cols2.index(colB)
+                                return lambda row1, row2: row2[posA] == row2[posB]
+                            except ValueError:
+                                print("Una columna solicitada en WHERE no existe.")
+                                return False
+                    else:
+                        print("Una tabla indicada en WHERE no existe.")
+                        return False
+            else:
+                B = B.strip('\'')
+                if tableA == table1:
+                    posA = cols1.index(colA)
+                    return lambda row1, row2: row1[posA] == B
+                else:
+                    posA = cols2.index(colA)
+                    return lambda row1, row2: row2[posA] == B
+        else:
+            if isColumn(B):
+                if hasTableName(B):
+                    if tableB == table1:
+                        try:
+                            posB = cols1.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        try:
+                            posA = cols1.index(colA)
+                            return lambda row1, row2: row1[posA] == row1[posB]
+                        except ValueError:
+                            try:
+                                posA = cols2.index(colA)
+                                return lambda row1, row2: row2[posA] == row1[posB]
+                            except ValueError:
+                                print("Una columna solicitada en WHERE no existe.")
+                                return False
+                    elif tableB == table2:
+                        try:
+                            posB = cols2.index(colB)
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+                        try:
+                            posA = cols1.index(colA)
+                            return lambda row1, row2: row1[posA] == row2[posB]
+                        except ValueError:
+                            try:
+                                posB = cols2.index(colB)
+                                return lambda row1, row2: row2[posA] == row2[posB]
+                            except ValueError:
+                                print("Una columna solicitada en WHERE no existe.")
+                                return False
+                else:
+                    try:
+                        posA = cols1.index(colA)
+                        try:
+                            posB = cols1.index(colB)
+                            return lambda row1, row2: row1[posA] == row1[posB]
+                        except ValueError:
+                            try:
+                                posB = cols2.index(colB)
+                                return lambda row1, row2: row1[posA] == row2[posB]
+                            except ValueError:
+                                print("Una columna solicitada en WHERE no existe.")
+                                return False
+                    except ValueError:
+                        try:
+                            posA = cols2.index(colA)
+                            try:
+                                posB = cols1.index(colB)
+                                return lambda row1, row2: row2[posA] == row1[posB]
+                            except ValueError:
+                                try:
+                                    posB = cols2.index(colB)
+                                    return lambda row1, row2: row2[posA] == row2[posB]
+                                except ValueError:
+                                    print("Una columna solicitada en WHERE no existe.")
+                                    return False
+                        except ValueError:
+                            print("Una columna solicitada en WHERE no existe.")
+                            return False
+            else:
+                B = B.strip('\'')
+                try:
+                    posA = cols1.index(colA)
+                    return lambda row1, row2: row1[posA] == B
+                except ValueError:
+                    try:
+                        posA = cols2.index(colA)
+                        return lambda row1, row2: row2[posA] == B
+                    except ValueError:
+                        print("Una columna solicitada en WHERE no existe.")
+                        return False
+
+def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     expr = andSplit(expr)
-    expr = [check(subexpr, cols) for subexpr in expr]
+    expr = [check(subexpr, cols1, table1, cols2, table2) for subexpr in expr]
     return lambda linea: all([subexpr(linea) for subexpr in expr])
 
-def stmtToBool(stmt, cols):
+def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = orSplit(stmt)
-    stmt = [exprToBool(expr, cols) for expr in stmt]
+    stmt = [exprToBool(expr, cols1, table1, cols2, table2) for expr in stmt]
     return lambda linea: any([expr(linea) for expr in stmt])
 
 def select(match):
@@ -62,6 +242,8 @@ def select(match):
             with file:
                 cols = file.readline().strip().split(",")
                 stmt = stmtToBool(where, cols) if where else lambda *_: True
+                if stmt is False:
+                    return
                 for line in file:
                     line = line.strip().split(",")
                     if stmt(line):
@@ -132,7 +314,8 @@ def update(table, set, stmt):
         cols = lines[0].strip().split(",")
         set[0] = cols.index(set[0])
         stmt = stmtToBool(stmt, cols)
-
+        if stmt is False:
+            return
         for line in lines:
             line = line.strip().split(",")
             if stmt(line):
