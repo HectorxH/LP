@@ -244,7 +244,7 @@ def select(match):
     out = []
     cols = []
     try:
-        file = open(table+".csv", 'r', encoding="utf8");
+        file = open(table+".csv", 'r', encoding="utf-8-sig");
     except FileNotFoundError:
         print("La tabla solicitada en FROM no existe.")
         return
@@ -253,7 +253,7 @@ def select(match):
             cols = file.readline().strip().split(",")
             try:
                 stmt = stmtToBool(where, cols) if where else lambda *_: True
-            except:
+            except (ColumnError, TableError):
                 return
             for line in file:
                 row = line.strip().split(",")
@@ -261,7 +261,7 @@ def select(match):
                     out.append(row)
     else:
         try:
-            join_file = open(inner+".csv", 'r', encoding="utf8")
+            join_file = open(inner+".csv", 'r', encoding="utf-8-sig")
         except FileNotFoundError:
             print("La tabla solicitada en INNER JOIN no existe.")
         with file, join_file:
@@ -271,7 +271,7 @@ def select(match):
             join_lines = join_file.read().splitlines()
             try:
                 stmt = stmtToBool(where, cols1, table, cols2, inner)
-            except:
+            except (ColumnError, TableError):
                 return
             for line in file:
                 row1 = line.strip().split(",")
@@ -301,17 +301,16 @@ def insert(table, row_dat):
     contador = 0
 
     try:
-        file = open(table+".csv", "r", encoding='utf8')
+        file = open(table+".csv", "r", encoding='utf-8-sig')
     except FileNotFoundError:
         print("La tabla solicitada no existe.")
         return
     else:
         with file:
             cols = file.readline().strip().split(",")
-
     string = ""
 
-    with open(table+".csv", "a", encoding='utf8') as file:
+    with open(table+".csv", "a", encoding='utf-8-sig') as file:
         for col in cols:
             if col in row_dat:
                 string = string + row_dat[col] + ","
@@ -322,6 +321,7 @@ def insert(table, row_dat):
 
         if len(row_dat) > contador:
             print("No se pudo ingresar uno de los datos ya que no existe su columna respectiva.")
+            return
         else:
             file.write(string)
 
@@ -331,7 +331,7 @@ def update(table, set, stmt):
     count = 0
 
     try:
-        file = open(table+".csv", "r", encoding='utf8')
+        file = open(table+".csv", "r", encoding='utf-8-sig')
     except FileNotFoundError:
         print("La tabla solicitada no existe.")
         return
@@ -339,12 +339,12 @@ def update(table, set, stmt):
         with file:
             lines = file.read().splitlines()
 
-    with open(table+".csv", "w", encoding='utf8') as file:
+    with open(table+".csv", "w", encoding='utf-8-sig') as file:
         cols = lines[0].strip().split(",")
         set[0] = cols.index(set[0])
         try:
             stmt = stmtToBool(stmt, cols)
-        except:
+        except (ColumnError, TableError):
             return
         for line in lines:
             line = line.strip().split(",")
