@@ -1,9 +1,19 @@
 import re
 from pprint import pprint as pp
 
-select_regex = re.compile(r"^(SELECT) +([^\s,=]+?(?: *, *[^\s,=]+?)*) +(FROM) +([^\s,=]+?)(?: +(INNER JOIN) +([^\s,=]+?))?(?: +(WHERE) +([^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:[^\s,=]+?(?:\.[^\s,=]+?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:[^\s,=]+?(?:\.[^\s,=]+?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?(?: +(ORDER BY) +([^\s,=]+?(?:\.[^\s,=]+?)?) +(ASC|DESC))?;$")
-insert_regex = re.compile(r"^(INSERT INTO) +([^\s,=]+?) +\( *([^\s,=]+?(?: *, *[^\s,=]+?)*) *\) +(VALUES) +\( *((?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *(?:-?\d+(?:\.\d+)?|'[^']*'))*) *\);$")
-update_regex = re.compile(r"^(UPDATE) +([^\s,=]+?) +(SET) +([^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +(WHERE) +([^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,=]+?(?:\.[^\s,=]+?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
+select_regex = re.compile(
+    r"^(SELECT) +((?:[^\s,='*\d][^\s,='*]*?(?: *, *[^\s,='*\d][^\s,='*]*?)*)|\*) +"
+    r"(FROM) +([^\s,='*\d][^\s,='*]*?)"
+    r"(?: +(INNER JOIN) +([^\s,='*\d][^\s,='*]*?))?"
+    r"(?: +(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?"
+    r"(?: +(ORDER BY) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?) +(ASC|DESC))?;$")
+insert_regex = re.compile(
+    r"^(INSERT INTO) +([^\s,='*\d][^\s,='*]*?) +\( *([^\s,='*\d][^\s,='*]*?(?: *, *[^\s,='*\d][^\s,='*]*?)*) *\) +"
+    r"(VALUES) +\( *((?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *(?:-?\d+(?:\.\d+)?|'[^']*'))*) *\);$")
+update_regex = re.compile(
+    r"^(UPDATE) +([^\s,='*\d][^\s,='*]*?) +"
+    r"(SET) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
+    r"(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
 def comaSplit(str):
     return re.split(r"(?:'|\")?(?: *),(?: *)(?:'|\")?", str.strip(" \n\'\""))
@@ -47,6 +57,7 @@ def select(match):
             file = open(table+".csv", "r", encoding='utf8');
         except FileNotFoundError:
             print("La tabla solicitada no existe.")
+            return
         else:
             with file:
                 cols = file.readline().strip().split(",")
@@ -82,6 +93,7 @@ def insert(table, row_dat):
         file = open(table+".csv", "r", encoding='utf8')
     except FileNotFoundError:
         print("La tabla solicitada no existe.")
+        return
     else:
         with file:
             cols = file.readline().strip().split(",")
@@ -111,6 +123,7 @@ def update(table, set, stmt):
         file = open(table+".csv", "r", encoding='utf8')
     except FileNotFoundError:
         print("La tabla solicitada no existe.")
+        return
     else:
         with file:
             lines = file.read().splitlines()
