@@ -1,5 +1,4 @@
 import re
-from pprint import pprint as pp
 
 class ColumnError(Exception):
     pass
