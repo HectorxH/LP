@@ -1,6 +1,12 @@
 import re
 from pprint import pprint as pp
 
+class ColumnError(Exception):
+    pass
+
+class TableError(Exception):
+    pass
+
 select_regex = re.compile(
     r"^(SELECT) +((?:[^\s,='*\d][^\s,='*]*?(?: *, *[^\s,='*\d][^\s,='*]*?)*)|\*) +"
     r"(FROM) +([^\s,='*\d][^\s,='*]*?)"
@@ -48,7 +54,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
             pos = cols1.index(A)
         except ValueError:
             print("Una columna solicitada en WHERE no existe.")
-            return False
+            raise ColumnError
         return lambda row: row[pos] == B;
     else:
         if hasTableName(A):
@@ -62,7 +68,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posB = cols1.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         return lambda row1, row2: row1[posA] == row1[posB]
                     elif tableA == table1 and tableB == table2:
                         try:
@@ -70,7 +76,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posB = cols2.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         return lambda row1, row2: row1[posA] == row2[posB]
                     elif tableA == table2 and tableB == table1:
                         try:
@@ -78,7 +84,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posB = cols1.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         return lambda row1, row2: row2[posA] == row1[posB]
                     elif tableA == table2 and tableB == table2:
                         try:
@@ -86,18 +92,18 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posB = cols2.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise tableError
                         return lambda row1, row2: row2[posA] == row2[posB]
                     else:
                         print("Una tabla indicada en WHERE no existe.")
-                        return False
+                        raise TableError
                 else:
                     if tableA == table1:
                         try:
                             posA = cols1.index(colA)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         try:
                             posB = cols1.index(colB)
                             return lambda row1, row2: row1[posA] == row1[posB]
@@ -107,13 +113,13 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 return lambda row1, row2: row1[posA] == row2[posB]
                             except ValueError:
                                 print("Una columna solicitada en WHERE no existe.")
-                                return False
+                                raise ColumnError
                     elif tableA == table2:
                         try:
                             posA = cols2.index(colA)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         try:
                             posB = cols1.index(colB)
                             return lambda row1, row2: row2[posA] == row1[posB]
@@ -123,10 +129,10 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 return lambda row1, row2: row2[posA] == row2[posB]
                             except ValueError:
                                 print("Una columna solicitada en WHERE no existe.")
-                                return False
+                                raise ColumnError
                     else:
                         print("Una tabla indicada en WHERE no existe.")
-                        return False
+                        raise TableError
             else:
                 B = B.strip('\'')
                 if tableA == table1:
@@ -143,7 +149,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posB = cols1.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         try:
                             posA = cols1.index(colA)
                             return lambda row1, row2: row1[posA] == row1[posB]
@@ -153,13 +159,13 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 return lambda row1, row2: row2[posA] == row1[posB]
                             except ValueError:
                                 print("Una columna solicitada en WHERE no existe.")
-                                return False
+                                raise ColumnError
                     elif tableB == table2:
                         try:
                             posB = cols2.index(colB)
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
                         try:
                             posA = cols1.index(colA)
                             return lambda row1, row2: row1[posA] == row2[posB]
@@ -169,7 +175,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 return lambda row1, row2: row2[posA] == row2[posB]
                             except ValueError:
                                 print("Una columna solicitada en WHERE no existe.")
-                                return False
+                                raise ColumnError
                 else:
                     try:
                         posA = cols1.index(colA)
@@ -182,7 +188,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 return lambda row1, row2: row1[posA] == row2[posB]
                             except ValueError:
                                 print("Una columna solicitada en WHERE no existe.")
-                                return False
+                                raise ColumnError
                     except ValueError:
                         try:
                             posA = cols2.index(colA)
@@ -195,10 +201,10 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                     return lambda row1, row2: row2[posA] == row2[posB]
                                 except ValueError:
                                     print("Una columna solicitada en WHERE no existe.")
-                                    return False
+                                    raise ColumnError
                         except ValueError:
                             print("Una columna solicitada en WHERE no existe.")
-                            return False
+                            raise ColumnError
             else:
                 B = B.strip('\'')
                 try:
@@ -210,17 +216,23 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                         return lambda row1, row2: row2[posA] == B
                     except ValueError:
                         print("Una columna solicitada en WHERE no existe.")
-                        return False
+                        raise ColumnError
 
 def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     expr = andSplit(expr)
     expr = [check(subexpr, cols1, table1, cols2, table2) for subexpr in expr]
-    return lambda linea: all([subexpr(linea) for subexpr in expr])
+    if not cols2:
+        return lambda row: all([subexpr(row) for subexpr in expr])
+    else:
+        return lambda row1, row2: all([subexpr(row1, row2) for subexpr in expr])
 
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = orSplit(stmt)
     stmt = [exprToBool(expr, cols1, table1, cols2, table2) for expr in stmt]
-    return lambda linea: any([expr(linea) for expr in stmt])
+    if not cols2:
+        return lambda row: any([expr(row) for expr in stmt])
+    else:
+        return lambda row1, row2: any([expr(row1, row2) for expr in stmt])
 
 def select(match):
     select = comaSplit(match[2])
@@ -230,26 +242,44 @@ def select(match):
     order_by = match[10]
     order_type = match[11]
 
+    out = []
+    cols = []
+    try:
+        file = open(table+".csv", 'r', encoding="utf8");
+    except FileNotFoundError:
+        print("La tabla solicitada en FROM no existe.")
+        return
     if not inner:
-        out = []
-        cols = []
-        try:
-            file = open(table+".csv", "r", encoding='utf8');
-        except FileNotFoundError:
-            print("La tabla solicitada no existe.")
-            return
-        else:
-            with file:
-                cols = file.readline().strip().split(",")
+        with file:
+            cols = file.readline().strip().split(",")
+            try:
                 stmt = stmtToBool(where, cols) if where else lambda *_: True
-                if stmt is False:
-                    return
-                for line in file:
-                    line = line.strip().split(",")
-                    if stmt(line):
-                        out.append(line)
+            except:
+                return
+            for line in file:
+                row = line.strip().split(",")
+                if stmt(row):
+                    out.append(row)
     else:
-        return print("f uwu")
+        try:
+            join_file = open(inner+".csv", 'r', encoding="utf8")
+        except FileNotFoundError:
+            print("La tabla solicitada en INNER JOIN no existe.")
+        with file, join_file:
+            cols1 = file.readline().strip().split(",")
+            cols2 = join_file.readline().strip().split(",")
+            cols = cols1+cols2
+            join_lines = join_file.read().splitlines()
+            try:
+                stmt = stmtToBool(where, cols1, table, cols2, inner)
+            except:
+                return
+            for line in file:
+                row1 = line.strip().split(",")
+                for join_line in join_lines:
+                    row2 = join_line.strip().split(",")
+                    if stmt(row1, row2):
+                        out.append(row1+row2)
 
     select = range(len(cols)) if "*" in select else list(map(lambda col: cols.index(col), select))
     if order_by:
@@ -313,8 +343,9 @@ def update(table, set, stmt):
     with open(table+".csv", "w", encoding='utf8') as file:
         cols = lines[0].strip().split(",")
         set[0] = cols.index(set[0])
-        stmt = stmtToBool(stmt, cols)
-        if stmt is False:
+        try:
+            stmt = stmtToBool(stmt, cols)
+        except:
             return
         for line in lines:
             line = line.strip().split(",")
@@ -340,7 +371,7 @@ while running:
     update_match = re.fullmatch(update_regex, query)
 
     if select_match:
-        if select_match[5] and not select_match[7]:
+        if select_match[5] and not select_match[7]: #INNER JOIN sin un WHERE
             print("Error de Sintaxis!")
         else:
             select(select_match)
