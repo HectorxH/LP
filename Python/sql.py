@@ -1,4 +1,5 @@
 import re
+from pprint import pprint as pp
 
 class ColumnError(Exception):
     pass
@@ -46,9 +47,9 @@ def isString(str):
 
 
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
-    (A, B) = equalSplitVar(subexpr)
-
     if not cols2:
+        (A, B) = equalSplit(subexpr)
+        B.strip('\'')
         try:
             pos = cols1.index(A)
         except ValueError:
@@ -56,6 +57,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
             raise ColumnError
         return lambda row: row[pos] == B;
     else:
+        (A, B) = equalSplitVar(subexpr)
         if hasTableName(A):
             (tableA, colA) = A.split('.')
             if isColumn(B):
@@ -141,6 +143,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                     posA = cols2.index(colA)
                     return lambda row1, row2: row2[posA] == B
         else:
+            colA = A
             if isColumn(B):
                 if hasTableName(B):
                     if tableB == table1:
@@ -341,17 +344,24 @@ def update(table, set, stmt):
 
     with open(table+".csv", "w", encoding='utf-8-sig') as file:
         cols = lines[0].strip().split(",")
-        set[0] = cols.index(set[0])
+        try:
+            set[0] = cols.index(set[0])
+        except ValueError:
+            print("Una columna indicada no existe.")
+            for line in lines:
+                file.write(','.join(line)+'\n')
+            return
         try:
             stmt = stmtToBool(stmt, cols)
         except (ColumnError, TableError):
-            return
+            stmt = lambda *_: False
+
         for line in lines:
             line = line.strip().split(",")
             if stmt(line):
                 line[set[0]] = set[1]
                 count += 1
-            line = ",".join(line)+"\n"
+            line = ','.join(line)+'\n'
             file.write(line)
 
     if count == 0:
