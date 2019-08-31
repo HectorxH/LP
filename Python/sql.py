@@ -296,7 +296,8 @@ def select(match):
             string = string + line[col] + "   "
         string = string[:-1]
         print(string)
-
+    if not out:
+        print("La informacion solicitada no existe.")
 
 
 def insert(table, row_dat):
