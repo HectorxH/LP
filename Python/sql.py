@@ -373,6 +373,7 @@ def update(table, set, stmt):
         print("Se han actualizado {} filas.".format(count))
 
 running = True
+print("Para salir ingrese el comando EXIT;")
 while running:
     query = str(input("Ingrese su query: "))
 
