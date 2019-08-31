@@ -40,7 +40,7 @@ def hasTableName(str):
     return '.' in str
 
 def isColumn(str):
-    return all(not c.isnumeric() and c is not '\'' for c in str)
+    return any(not c.isnumeric() and c is not '\'' for c in str)
 
 def isString(str):
     return '\'' in str
