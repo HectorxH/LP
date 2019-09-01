@@ -8,217 +8,95 @@ class TableError(Exception):
     pass
 
 select_regex = re.compile(
-    r"^(SELECT) +((?:[^\s,='*\d][^\s,='*]*?(?: *, *[^\s,='*\d][^\s,='*]*?)*)|\*) +"
-    r"(FROM) +([^\s,='*\d][^\s,='*]*?)"
-    r"(?: +(INNER JOIN) +([^\s,='*\d][^\s,='*]*?))?"
-    r"(?: +(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?"
-    r"(?: +(ORDER BY) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)?) +(ASC|DESC))?;$")
+    r"^(SELECT) +((?:[a-zA-Z][^\s,='*]*?(?: *, *[a-zA-Z][^\s,='*]*?)*)|\*) +"
+    r"(FROM) +([a-zA-Z][^\s,='*]*?)"
+    r"(?: +(INNER JOIN) +([a-zA-Z][^\s,='*]*?))?"
+    r"(?: +(WHERE) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?"
+    r"(?: +(ORDER BY) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?) +(ASC|DESC))?;$")
 insert_regex = re.compile(
-    r"^(INSERT INTO) +([^\s,='*\d][^\s,='*]*?) +\( *([^\s,='*\d][^\s,='*]*?(?: *, *[^\s,='*\d][^\s,='*]*?)*) *\) +"
+    r"^(INSERT INTO) +([a-zA-Z][^\s,='*]*?) +\( *([a-zA-Z][^\s,='*]*?(?: *, *[a-zA-Z][^\s,='*]*?)*) *\) +"
     r"(VALUES) +\( *((?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *(?:-?\d+(?:\.\d+)?|'[^']*'))*) *\);$")
 update_regex = re.compile(
-    r"^(UPDATE) +([^\s,='*\d][^\s,='*]*?) +"
-    r"(SET) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
-    r"(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
+    r"^(UPDATE) +([a-zA-Z][^\s,='*]*?) +"
+    r"(SET) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
+    r"(WHERE) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
 def comaSplit(str):
-    return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n\'"))
+    return re.split(r"(?: *),(?: *)", str.strip(" \n"))
 
 def orSplit(str):
-    return re.split(r"'?(?: +)OR(?: +)'?", str.strip(" \n\'"))
+    return re.split(r"(?: +)OR(?: +)", str.strip(" \n"))
 
 def andSplit(str):
-    return re.split(r"'?(?: +)AND(?: +)'?", str.strip(" \n\'"))
+    return re.split(r"(?: +)AND(?: +)", str.strip(" \n"))
 
 def equalSplit(str):
-    return re.split(r"'?(?: *)=(?: *)'?", str.strip(" \n\'"))
+    return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
 
 def equalSplitVar(str):
-    return re.split(r"(?: *)=(?: *)", str.strip())
+    return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
 
 def hasTableName(str):
     return '.' in str
 
 def isColumn(str):
-    return any(not c.isnumeric() and c is not '\'' for c in str)
+    return str[0].isalpha()
 
-def isString(str):
-    return '\'' in str
-
+def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
+    (table, col) = str.split('.') if hasTableName(str) else ("", str)
+    if table is "" or table1 is "":
+        try:
+            return (table1, cols1.index(col))
+        except:
+            try:
+                return (table2, cols2.index(col))
+            except:
+                print("Una o mas de las columnas solicitadas no existen.")
+                raise ColumnError
+    elif table == table1:
+        try:
+            return (table, cols1.index(col))
+        except:
+            print("Una o mas de las columnas solicitadas no existen.")
+            raise ColumnError
+    elif table == table2:
+        try:
+            return (table, cols2.index(col))
+        except:
+            print("Una o mas de las columnas solicitadas no existen.")
+            raise ColumnError
+    else:
+        print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen")
+        raise TableError
 
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
+    (A, B) = equalSplit(subexpr)
     if not cols2:
-        (A, B) = equalSplit(subexpr)
         B.strip('\'')
-        try:
-            pos = cols1.index(A)
-        except ValueError:
-            print("Una columna solicitada no existe.")
-            raise ColumnError
+        (*_, pos) = getIndex(A, cols1)
         return lambda row: row[pos] == B;
     else:
-        (A, B) = equalSplitVar(subexpr)
-        if hasTableName(A):
-            (tableA, colA) = A.split('.')
-            if isColumn(B):
-                if hasTableName(B):
-                    (tableB, colB) = B.split('.')
-                    if tableA == table1 and tableB == table1:
-                        try:
-                            posA = cols1.index(colA)
-                            posB = cols1.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        return lambda row1, row2: row1[posA] == row1[posB]
-                    elif tableA == table1 and tableB == table2:
-                        try:
-                            posA = cols1.index(colA)
-                            posB = cols2.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        return lambda row1, row2: row1[posA] == row2[posB]
-                    elif tableA == table2 and tableB == table1:
-                        try:
-                            posA = cols2.index(colA)
-                            posB = cols1.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        return lambda row1, row2: row2[posA] == row1[posB]
-                    elif tableA == table2 and tableB == table2:
-                        try:
-                            posA = cols2.index(colA)
-                            posB = cols2.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise tableError
-                        return lambda row1, row2: row2[posA] == row2[posB]
-                    else:
-                        print("Una tabla indicada no existe.")
-                        raise TableError
-                else:
-                    if tableA == table1:
-                        try:
-                            posA = cols1.index(colA)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        try:
-                            posB = cols1.index(colB)
-                            return lambda row1, row2: row1[posA] == row1[posB]
-                        except ValueError:
-                            try:
-                                posB = cols2.index(colB)
-                                return lambda row1, row2: row1[posA] == row2[posB]
-                            except ValueError:
-                                print("Una columna solicitada no existe.")
-                                raise ColumnError
-                    elif tableA == table2:
-                        try:
-                            posA = cols2.index(colA)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        try:
-                            posB = cols1.index(colB)
-                            return lambda row1, row2: row2[posA] == row1[posB]
-                        except ValueError:
-                            try:
-                                posB = cols2.index(colB)
-                                return lambda row1, row2: row2[posA] == row2[posB]
-                            except ValueError:
-                                print("Una columna solicitada no existe.")
-                                raise ColumnError
-                    else:
-                        print("Una tabla indicada no existe.")
-                        raise TableError
-            else:
-                B = B.strip('\'')
-                if tableA == table1:
-                    posA = cols1.index(colA)
-                    return lambda row1, row2: row1[posA] == B
-                else:
-                    posA = cols2.index(colA)
-                    return lambda row1, row2: row2[posA] == B
+        (tableA, posA) = getIndex(A, cols1, cols2, table1, table2)
+        if isColumn(B):
+            (tableB, posB) = getIndex(B, cols1, cols2, table1, table2)
         else:
-            colA = A
-            if isColumn(B):
-                if hasTableName(B):
-                    if tableB == table1:
-                        try:
-                            posB = cols1.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        try:
-                            posA = cols1.index(colA)
-                            return lambda row1, row2: row1[posA] == row1[posB]
-                        except ValueError:
-                            try:
-                                posA = cols2.index(colA)
-                                return lambda row1, row2: row2[posA] == row1[posB]
-                            except ValueError:
-                                print("Una columna solicitada no existe.")
-                                raise ColumnError
-                    elif tableB == table2:
-                        try:
-                            posB = cols2.index(colB)
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
-                        try:
-                            posA = cols1.index(colA)
-                            return lambda row1, row2: row1[posA] == row2[posB]
-                        except ValueError:
-                            try:
-                                posB = cols2.index(colB)
-                                return lambda row1, row2: row2[posA] == row2[posB]
-                            except ValueError:
-                                print("Una columna solicitada no existe.")
-                                raise ColumnError
-                else:
-                    try:
-                        posA = cols1.index(colA)
-                        try:
-                            posB = cols1.index(colB)
-                            return lambda row1, row2: row1[posA] == row1[posB]
-                        except ValueError:
-                            try:
-                                posB = cols2.index(colB)
-                                return lambda row1, row2: row1[posA] == row2[posB]
-                            except ValueError:
-                                print("Una columna solicitada no existe.")
-                                raise ColumnError
-                    except ValueError:
-                        try:
-                            posA = cols2.index(colA)
-                            try:
-                                posB = cols1.index(colB)
-                                return lambda row1, row2: row2[posA] == row1[posB]
-                            except ValueError:
-                                try:
-                                    posB = cols2.index(colB)
-                                    return lambda row1, row2: row2[posA] == row2[posB]
-                                except ValueError:
-                                    print("Una columna solicitada no existe.")
-                                    raise ColumnError
-                        except ValueError:
-                            print("Una columna solicitada no existe.")
-                            raise ColumnError
+            tableB = ""
+            B = B.strip('\'')
+        if tableB == table1:
+            if tableA == table1:
+                return lambda row1, row2: row1[posA] == row1[posB]
             else:
-                B = B.strip('\'')
-                try:
-                    posA = cols1.index(colA)
-                    return lambda row1, row2: row1[posA] == B
-                except ValueError:
-                    try:
-                        posA = cols2.index(colA)
-                        return lambda row1, row2: row2[posA] == B
-                    except ValueError:
-                        print("Una columna solicitada no existe.")
-                        raise ColumnError
+                return lambda row1, row2: row2[posA] == row1[posB]
+        elif tableB == table2:
+            if tableA == table1:
+                return lambda row1, row2: row1[posA] == row2[posB]
+            else:
+                return lambda row1, row2: row2[posA] == row2[posB]
+        else:
+            if tableA == table1:
+                return lambda row1, row2: row1[posA] == B
+            else:
+                return lambda row1, row2: row2[posA] == B
 
 def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     expr = andSplit(expr)
@@ -236,16 +114,10 @@ def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     else:
         return lambda row1, row2: any([expr(row1, row2) for expr in stmt])
 
-def select(match):
-    select = comaSplit(match[2])
-    table = match[4]
-    inner = match[6]
-    where = match[8]
-    order_by = match[10]
-    order_type = match[11]
-
+def select(sel, table, inner, where, order_by, order_type):
     out = []
-    cols = []
+    cols1 = []
+    cols2 = []
     try:
         file = open(table+".csv", 'r', encoding="utf-8-sig");
     except FileNotFoundError:
@@ -253,9 +125,9 @@ def select(match):
         return
     if not inner:
         with file:
-            cols = file.readline().strip().split(",")
+            cols1 = file.readline().strip().split(",")
             try:
-                stmt = stmtToBool(where, cols) if where else lambda *_: True
+                stmt = stmtToBool(where, cols1) if where else lambda *_: True
             except (ColumnError, TableError):
                 return
             for line in file:
@@ -270,7 +142,6 @@ def select(match):
         with file, join_file:
             cols1 = file.readline().strip().split(",")
             cols2 = join_file.readline().strip().split(",")
-            cols = cols1+cols2
             join_lines = join_file.read().splitlines()
             try:
                 stmt = stmtToBool(where, cols1, table, cols2, inner)
@@ -282,22 +153,44 @@ def select(match):
                     row2 = join_line.strip().split(",")
                     if stmt(row1, row2):
                         out.append(row1+row2)
+    cols = cols1+cols2
 
-    select = range(len(cols)) if "*" in select else list(map(lambda col: cols.index(col), select))
+    for (i, col) in enumerate(sel):
+        if col == '*':
+            sel = range(len(cols))
+            break
+        else:
+            try:
+                (t, sel[i]) = getIndex(col, cols1, cols2, table, inner)
+                if t == inner:
+                    sel[i] += len(cols1)
+            except (ColumnError, TableError):
+                return
+
     if order_by:
-        i = cols.index(order_by)
+        try:
+            (*_, i) = getIndex(order_by, cols)
+        except (ColumnError, TableError):
+            return
         out = sorted(out, key=lambda l: l[i])
         if order_type == "DESC":
             out = reversed(out)
 
-    for line in out:
-        string = ""
-        for col in select:
-            string = string + line[col] + "   "
-        string = string[:-1]
-        print(string)
     if not out:
         print("La informacion solicitada no existe.")
+        return
+
+    new_out = []
+    max_lens = [0] * len(cols)
+    for line in out:
+        l = []
+        for col in sel:
+            l.append(line[col])
+            max_lens[col] = max(max_lens[col], len(line[col]))
+        new_out.append(l)
+
+    row_format = ''.join("{:<"+str(max_lens[col]+1)+"}" for col in sel)
+    print('', *[row_format.format(*list) for list in new_out] , '', sep='\n')
 
 
 def insert(table, row_dat):
@@ -382,10 +275,16 @@ while running:
     update_match = re.fullmatch(update_regex, query)
 
     if select_match:
-        if select_match[5] and not select_match[7]: #INNER JOIN sin un WHERE
+        sel = comaSplit(select_match[2])
+        table = select_match[4]
+        inner = select_match[6]
+        where = select_match[8]
+        order_by = select_match[10]
+        order_type = select_match[11]
+        if inner and not where: #INNER JOIN sin un WHERE
             print("Error de Sintaxis!")
         else:
-            select(select_match)
+            select(sel, table, inner, where, order_by, order_type)
     elif insert_match:
         table = insert_match[2]
         keys = comaSplit(insert_match[3])
