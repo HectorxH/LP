@@ -114,7 +114,7 @@ Entradas:
 Salida:
 (bool) Output: Retorna TRUE si es una columna y FALSE si no lo es.
 ——————–
-Verifica si el string es una columna o no.
+Verifica si el string tiene el formato de una columna válida.
 '''
 def isColumn(str):
     return str[0].isalpha()
