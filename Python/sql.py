@@ -21,27 +21,115 @@ update_regex = re.compile(
     r"(SET) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
     r"(WHERE) +([^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[^\s,='*\d][^\s,='*]*?(?:\.[^\s,='*\d][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
-def comaSplit(str):
+'''
+commaSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por comas ignorando espacios.
+——————–
+Extrae del string entregado los strings entre comas y espacios.
+'''
+def commaSplit(str):
     return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n\'"))
 
+'''
+orSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por OR ignorando espacios.
+——————–
+Extrae del string entregado los strings entre OR y espacios.
+'''
 def orSplit(str):
     return re.split(r"'?(?: +)OR(?: +)'?", str.strip(" \n\'"))
 
+'''
+andSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por AND ignorando espacios.
+——————–
+Extrae del string entregado los strings entre AND y espacios.
+'''
 def andSplit(str):
     return re.split(r"'?(?: +)AND(?: +)'?", str.strip(" \n\'"))
 
+'''
+equalSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por = ignorando espacios.
+——————–
+Extrae del string entregado los strings entre = y espacios.
+'''
 def equalSplit(str):
     return re.split(r"'?(?: *)=(?: *)'?", str.strip(" \n\'"))
 
+'''
+equalSplitVar
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(Tipo de dato) Output:
+——————–
+Descripción de la función.
+'''
 def equalSplitVar(str):
     return re.split(r"(?: *)=(?: *)", str.strip())
 
+'''
+hasTableName
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(bool) Output: Retorna TRUE si contiene . y FALSE si no.
+——————–
+Verifica si el string contiene un . para reconocer si para reconocer si es de la forma nombreTabla.nombreColumna
+'''
 def hasTableName(str):
     return '.' in str
 
+'''
+isColumn
+——————–
+Entradas:
+(string) str: String entregado a la función
+——————–
+Salida:
+(bool) Output: Retorna TRUE si es una columna y FALSE si no lo es.
+——————–
+Verifica si el string es una columna o no.
+'''
 def isColumn(str):
-    return any(not c.isnumeric() and c is not '\'' for c in str)
+    return str[0].isalpha()
 
+'''
+isString
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(bool) Output: Retorna TRUE si es un string y FALSE si no lo es.
+——————–
+Verifica si el string contiene un ' para reconocer si hay un string.
+'''
 def isString(str):
     return '\'' in str
 
@@ -49,14 +137,17 @@ def isString(str):
 check
 ——————–
 Entradas:
-(Tipo de dato) Descripción
-(Tipo de dato) Descripción
-...
+(string) subexpr: Condición de la forma columna = valor o columna = columna.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
 ——————–
 Salida:
-(Tipo de dato) Output:
+(función) Output: Se evalúa en TRUE si se cumple la condición de subexpr y en FALSE si no la cumple.
 ——————–
-Descripción de la función.
+Recibe una condición de la forma columna = valor o columna = columna y retorna una función que se evalúa en
+TRUE o FALSE si cumple esta condición o no.
 '''
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
     if not cols2:
@@ -268,7 +359,7 @@ Entradas:
 Salida:
 (función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
 ——————–
-Recibe la condición para WHERE y retorna una función que se evalua en TRUE o FALSE si cumple esta condición o no.
+Recibe la condición para WHERE y retorna una función que se evalúa en TRUE o FALSE si cumple esta condición o no.
 '''
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = orSplit(stmt)
@@ -282,7 +373,12 @@ def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
 select
 ——————–
 Entradas:
-(Tipo de dato) Descripción
+(lista) sel: Lista de columnas que se quieren mostrar, contiene solo '*' si se quieren mostrar todas las columnas.
+(string) table: Tabla a la que se le quiere hacer SELECT.
+(string) inner: Tabla a la que se le quiere hacer INNER JOIN.
+(string) where: Condición para WHERE.
+(string) order_by: Columna que se quiere ordenar.
+(string) order_type: Ordenar de manera adcendente o descendente.
 ——————–
 Salida:
 (void) Output: No retorna.
@@ -291,7 +387,7 @@ Imprime los datos de la tabla que son especificados.
 Puede juntar columnas de distintas tablas y ordenarlas de forma ascendente y descendente.
 '''
 def select(match):
-    select = comaSplit(match[2])
+    select = commaSplit(match[2])
     table = match[4]
     inner = match[6]
     where = match[8]
@@ -466,8 +562,8 @@ while running:
             select(select_match)
     elif insert_match:
         table = insert_match[2]
-        keys = comaSplit(insert_match[3])
-        values = comaSplit(insert_match[5])
+        keys = commaSplit(insert_match[3])
+        values = commaSplit(insert_match[5])
 
         if len(keys) != len(values):
             print("Error de Sintaxis!")
