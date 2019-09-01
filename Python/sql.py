@@ -21,26 +21,118 @@ update_regex = re.compile(
     r"(SET) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
     r"(WHERE) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 
-def comaSplit(str):
-    return re.split(r"(?: *),(?: *)", str.strip(" \n"))
 
+'''
+commaSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por comas ignorando espacios.
+——————–
+Extrae del string entregado los strings entre comas y espacios.
+'''
+def commaSplit(str):
+    return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n\'"))
+
+'''
+orSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por OR ignorando espacios.
+——————–
+Extrae del string entregado los strings entre OR y espacios.
+'''
 def orSplit(str):
     return re.split(r"(?: +)OR(?: +)", str.strip(" \n"))
 
+'''
+andSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por AND ignorando espacios.
+——————–
+Extrae del string entregado los strings entre AND y espacios.
+'''
 def andSplit(str):
     return re.split(r"(?: +)AND(?: +)", str.strip(" \n"))
 
+'''
+equalSplit
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(lista) Output: Retorna una lista con los strings separados por = ignorando espacios.
+——————–
+Extrae del string entregado los strings entre = y espacios.
+'''
 def equalSplit(str):
     return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
 
+'''
+equalSplitVar
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(Tipo de dato) Output:
+——————–
+Descripción de la función.
+'''
 def equalSplitVar(str):
     return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
 
+'''
+hasTableName
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(bool) Output: Retorna TRUE si contiene . y FALSE si no.
+——————–
+Verifica si el string contiene un . para reconocer si para reconocer si es de la forma nombreTabla.nombreColumna
+'''
 def hasTableName(str):
     return '.' in str
 
+'''
+isColumn
+——————–
+Entradas:
+(string) str: String entregado a la función
+——————–
+Salida:
+(bool) Output: Retorna TRUE si es una columna y FALSE si no lo es.
+——————–
+Verifica si el string tiene el formato de una columna válida.
+'''
 def isColumn(str):
     return str[0].isalpha()
+
+'''
+isString
+——————–
+Entradas:
+(string) str: String entregado a la función.
+——————–
+Salida:
+(bool) Output: Retorna TRUE si es un string y FALSE si no lo es.
+——————–
+Verifica si el string contiene un ' para reconocer si hay un string.
+'''
+def isString(str):
+    return '\'' in str
 
 def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
     (table, col) = str.split('.') if hasTableName(str) else ("", str)
@@ -68,6 +160,24 @@ def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
     else:
         print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen")
         raise TableError
+
+        
+'''
+check
+——————–
+Entradas:
+(string) subexpr: Condición de la forma columna = valor o columna = columna.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(función) Output: Se evalúa en TRUE si se cumple la condición de subexpr y en FALSE si no la cumple.
+——————–
+Recibe una condición de la forma columna = valor o columna = columna y retorna una función que se evalúa en
+TRUE o FALSE si cumple esta condición o no.
+'''
 
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
     (A, B) = equalSplit(subexpr)
@@ -98,6 +208,21 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
             else:
                 return lambda row1, row2: row2[posA] == B
 
+'''
+exprToBool
+——————–
+Entradas:
+(string) expr: Condición que solo puede contener AND.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
+——————–
+Recibe un string que lo separa por AND. Luego llama a la función check y le entrega cada uno de estos strings.
+'''
 def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     expr = andSplit(expr)
     expr = [check(subexpr, cols1, table1, cols2, table2) for subexpr in expr]
@@ -106,6 +231,21 @@ def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     else:
         return lambda row1, row2: all([subexpr(row1, row2) for subexpr in expr])
 
+'''
+stmtToBool
+——————–
+Entradas:
+(string) stmt: Condición ingresada para WHERE.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
+——————–
+Recibe la condición para WHERE y retorna una función que se evalúa en TRUE o FALSE si cumple esta condición o no.
+'''
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = orSplit(stmt)
     stmt = [exprToBool(expr, cols1, table1, cols2, table2) for expr in stmt]
@@ -114,7 +254,25 @@ def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     else:
         return lambda row1, row2: any([expr(row1, row2) for expr in stmt])
 
+'''
+select
+——————–
+Entradas:
+(lista) sel: Lista de columnas que se quieren mostrar, contiene solo '*' si se quieren mostrar todas las columnas.
+(string) table: Tabla a la que se le quiere hacer SELECT.
+(string) inner: Tabla a la que se le quiere hacer INNER JOIN.
+(string) where: Condición para WHERE.
+(string) order_by: Columna que se quiere ordenar.
+(string) order_type: Ordenar de manera adcendente o descendente.
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Imprime los datos de la tabla que son especificados.
+Puede juntar columnas de distintas tablas y ordenarlas de forma ascendente y descendente.
+'''
 def select(sel, table, inner, where, order_by, order_type):
+
     out = []
     cols1 = []
     cols2 = []
@@ -192,7 +350,18 @@ def select(sel, table, inner, where, order_by, order_type):
     row_format = ''.join("{:<"+str(max_lens[col]+1)+"}" for col in sel)
     print('', *[row_format.format(*list) for list in new_out] , '', sep='\n')
 
-
+'''
+insert
+——————–
+Entradas:
+(string) table: Nombre de la tabla a la que se le insertará datos.
+(diccionario) row_dat: Diccionario que contiene los datos que se ingresarán.
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Añade una fila al final de la tabla entregada a la función con los datos que se han ingresado.
+'''
 def insert(table, row_dat):
     cols = ""
     contador = 0
@@ -224,6 +393,19 @@ def insert(table, row_dat):
 
     print("Se ha insertado 1 fila.")
 
+'''
+update
+——————–
+Entradas:
+(string) table: Nombre de la tabla a la que se le actualizarán los datos.
+(lista de strings) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
+(string) stmt: Condición que se debe cumplir para cambiar el valor que corresponde a esa fila.
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Actualiza la tabla entregada a la función con los valores han sido ingresados.
+'''
 def update(table, set, stmt):
     count = 0
 
@@ -287,8 +469,8 @@ while running:
             select(sel, table, inner, where, order_by, order_type)
     elif insert_match:
         table = insert_match[2]
-        keys = comaSplit(insert_match[3])
-        values = comaSplit(insert_match[5])
+        keys = commaSplit(insert_match[3])
+        values = commaSplit(insert_match[5])
 
         if len(keys) != len(values):
             print("Error de Sintaxis!")
