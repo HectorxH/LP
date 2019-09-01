@@ -40,12 +40,24 @@ def hasTableName(str):
     return '.' in str
 
 def isColumn(str):
-    return all(not c.isnumeric() and c is not '\'' for c in str)
+    return any(not c.isnumeric() and c is not '\'' for c in str)
 
 def isString(str):
     return '\'' in str
 
-
+'''
+check
+——————–
+Entradas:
+(Tipo de dato) Descripción
+(Tipo de dato) Descripción
+...
+——————–
+Salida:
+(Tipo de dato) Output:
+——————–
+Descripción de la función.
+'''
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
     if not cols2:
         (A, B) = equalSplit(subexpr)
@@ -53,7 +65,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
         try:
             pos = cols1.index(A)
         except ValueError:
-            print("Una columna solicitada en WHERE no existe.")
+            print("Una columna solicitada no existe.")
             raise ColumnError
         return lambda row: row[pos] == B;
     else:
@@ -68,7 +80,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posA = cols1.index(colA)
                             posB = cols1.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         return lambda row1, row2: row1[posA] == row1[posB]
                     elif tableA == table1 and tableB == table2:
@@ -76,7 +88,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posA = cols1.index(colA)
                             posB = cols2.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         return lambda row1, row2: row1[posA] == row2[posB]
                     elif tableA == table2 and tableB == table1:
@@ -84,7 +96,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posA = cols2.index(colA)
                             posB = cols1.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         return lambda row1, row2: row2[posA] == row1[posB]
                     elif tableA == table2 and tableB == table2:
@@ -92,18 +104,18 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                             posA = cols2.index(colA)
                             posB = cols2.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise tableError
                         return lambda row1, row2: row2[posA] == row2[posB]
                     else:
-                        print("Una tabla indicada en WHERE no existe.")
+                        print("Una tabla indicada no existe.")
                         raise TableError
                 else:
                     if tableA == table1:
                         try:
                             posA = cols1.index(colA)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         try:
                             posB = cols1.index(colB)
@@ -113,13 +125,13 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 posB = cols2.index(colB)
                                 return lambda row1, row2: row1[posA] == row2[posB]
                             except ValueError:
-                                print("Una columna solicitada en WHERE no existe.")
+                                print("Una columna solicitada no existe.")
                                 raise ColumnError
                     elif tableA == table2:
                         try:
                             posA = cols2.index(colA)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         try:
                             posB = cols1.index(colB)
@@ -129,10 +141,10 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 posB = cols2.index(colB)
                                 return lambda row1, row2: row2[posA] == row2[posB]
                             except ValueError:
-                                print("Una columna solicitada en WHERE no existe.")
+                                print("Una columna solicitada no existe.")
                                 raise ColumnError
                     else:
-                        print("Una tabla indicada en WHERE no existe.")
+                        print("Una tabla indicada no existe.")
                         raise TableError
             else:
                 B = B.strip('\'')
@@ -150,7 +162,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                         try:
                             posB = cols1.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         try:
                             posA = cols1.index(colA)
@@ -160,13 +172,13 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 posA = cols2.index(colA)
                                 return lambda row1, row2: row2[posA] == row1[posB]
                             except ValueError:
-                                print("Una columna solicitada en WHERE no existe.")
+                                print("Una columna solicitada no existe.")
                                 raise ColumnError
                     elif tableB == table2:
                         try:
                             posB = cols2.index(colB)
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
                         try:
                             posA = cols1.index(colA)
@@ -176,7 +188,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 posB = cols2.index(colB)
                                 return lambda row1, row2: row2[posA] == row2[posB]
                             except ValueError:
-                                print("Una columna solicitada en WHERE no existe.")
+                                print("Una columna solicitada no existe.")
                                 raise ColumnError
                 else:
                     try:
@@ -189,7 +201,7 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                 posB = cols2.index(colB)
                                 return lambda row1, row2: row1[posA] == row2[posB]
                             except ValueError:
-                                print("Una columna solicitada en WHERE no existe.")
+                                print("Una columna solicitada no existe.")
                                 raise ColumnError
                     except ValueError:
                         try:
@@ -202,10 +214,10 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                                     posB = cols2.index(colB)
                                     return lambda row1, row2: row2[posA] == row2[posB]
                                 except ValueError:
-                                    print("Una columna solicitada en WHERE no existe.")
+                                    print("Una columna solicitada no existe.")
                                     raise ColumnError
                         except ValueError:
-                            print("Una columna solicitada en WHERE no existe.")
+                            print("Una columna solicitada no existe.")
                             raise ColumnError
             else:
                 B = B.strip('\'')
@@ -217,9 +229,24 @@ def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
                         posA = cols2.index(colA)
                         return lambda row1, row2: row2[posA] == B
                     except ValueError:
-                        print("Una columna solicitada en WHERE no existe.")
+                        print("Una columna solicitada no existe.")
                         raise ColumnError
 
+'''
+exprToBool
+——————–
+Entradas:
+(string) expr: Condición que solo puede contener AND.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
+——————–
+Recibe un string que lo separa por AND. Luego llama a la función check y le entrega cada uno de estos strings.
+'''
 def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     expr = andSplit(expr)
     expr = [check(subexpr, cols1, table1, cols2, table2) for subexpr in expr]
@@ -228,6 +255,21 @@ def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
     else:
         return lambda row1, row2: all([subexpr(row1, row2) for subexpr in expr])
 
+'''
+stmtToBool
+——————–
+Entradas:
+(string) stmt: Condición ingresada para WHERE.
+(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
+——————–
+Recibe la condición para WHERE y retorna una función que se evalua en TRUE o FALSE si cumple esta condición o no.
+'''
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = orSplit(stmt)
     stmt = [exprToBool(expr, cols1, table1, cols2, table2) for expr in stmt]
@@ -236,6 +278,18 @@ def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     else:
         return lambda row1, row2: any([expr(row1, row2) for expr in stmt])
 
+'''
+select
+——————–
+Entradas:
+(Tipo de dato) Descripción
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Imprime los datos de la tabla que son especificados.
+Puede juntar columnas de distintas tablas y ordenarlas de forma ascendente y descendente.
+'''
 def select(match):
     select = comaSplit(match[2])
     table = match[4]
@@ -249,7 +303,7 @@ def select(match):
     try:
         file = open(table+".csv", 'r', encoding="utf-8-sig");
     except FileNotFoundError:
-        print("La tabla solicitada en FROM no existe.")
+        print("La tabla solicitada no existe.")
         return
     if not inner:
         with file:
@@ -299,7 +353,18 @@ def select(match):
     if not out:
         print("La informacion solicitada no existe.")
 
-
+'''
+insert
+——————–
+Entradas:
+(string) table: Nombre de la tabla a la que se le insertará datos.
+(diccionario) row_dat: Diccionario que contiene los datos que se ingresarán.
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Añade una fila al final de la tabla entregada a la función con los datos que se han ingresado.
+'''
 def insert(table, row_dat):
     cols = ""
     contador = 0
@@ -331,6 +396,19 @@ def insert(table, row_dat):
 
     print("Se ha insertado 1 fila.")
 
+'''
+update
+——————–
+Entradas:
+(string) table: Nombre de la tabla a la que se le actualizarán los datos.
+(lista de strings) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
+(string) stmt: Condición que se debe cumplir para cambiar el valor que corresponde a esa fila.
+——————–
+Salida:
+(void) Output: No retorna.
+——————–
+Actualiza la tabla entregada a la función con los valores han sido ingresados.
+'''
 def update(table, set, stmt):
     count = 0
 
