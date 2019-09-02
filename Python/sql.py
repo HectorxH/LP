@@ -90,22 +90,18 @@ def getIndex(col, cols1, cols2 = [], table1 = "", table2 = ""):
             try:
                 return (table2, cols2.index(col))
             except:
-                print("Una o mas de las columnas solicitadas no existen.\n")
                 raise ColumnError
     elif table == table1:
         try:
             return (table, cols1.index(col))
         except:
-            print("Una o mas de las columnas solicitadas no existen.\n")
             raise ColumnError
     elif table == table2:
         try:
             return (table, cols2.index(col))
         except:
-            print("Una o mas de las columnas solicitadas no existen.\n")
             raise ColumnError
     else:
-        print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
         raise TableError
 
 
@@ -123,7 +119,7 @@ Salida:
 (función) Output: Se evalúa en TRUE si se cumple la condición de subexpr y en FALSE si no la cumple.
 ——————–
 Recibe una condición de la forma columna = valor o columna = columna y retorna una función que se evalúa en
-TRUE o FALSE si cumple esta condición o no.
+TRUE o FALSE si sus parametros cumplen esta condición o no.
 '''
 
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
@@ -191,7 +187,7 @@ Entradas:
 Salida:
 (función) Output: Se evalúa en TRUE si la(s) lista(s) cumplen con la condición ingresada y FALSE si no la cumple.
 ——————–
-Recibe la condición para WHERE y retorna una función que se evalúa en TRUE o FALSE si cumple esta condición o no.
+Recibe la condición para WHERE y retorna una función que se evalúa en TRUE o FALSE si sus parametros cumplen esta condición o no.
 '''
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
     stmt = splitter(stmt, "OR")
@@ -219,12 +215,12 @@ Imprime los datos de la tabla que son seleccionados.
 Puede juntar columnas de distintas tablas y ordenarlas de forma ascendente y descendente.
 '''
 def select(sel, table, inner, where, order_by, order_type):
+    out = [] #Matriz con las filas que se deben mostrar.
+    cols1 = [] #Lista con los rotulos de la primera tabla (FROM)
+    cols2 = [] #Lista con los rotulos de la segunda tabla si es que esta existe (INNER JOIN)
 
-    out = []
-    cols1 = []
-    cols2 = []
     try:
-        file = open(table+".csv", 'r', encoding="utf-8-sig");
+        file = open(table+".csv", 'r', encoding="utf-8-sig")
     except FileNotFoundError:
         print("La tabla solicitada no existe.\n")
         return
@@ -233,11 +229,16 @@ def select(sel, table, inner, where, order_by, order_type):
             cols1 = file.readline().strip().split(",")
             try:
                 stmt = stmtToBool(where, cols1) if where else lambda *_: True
-            except (ColumnError, TableError):
+            except ColumnError:
+                print("Una o mas de las columnas solicitadas no existen.\n")
                 return
+            except TableError:
+                print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
+                return
+
             for line in file:
                 row = line.strip().split(",")
-                if stmt(row):
+                if stmt(row): #Si la fila cumple la condicion especificada en WHERE
                     out.append(row)
     else:
         try:
@@ -250,40 +251,52 @@ def select(sel, table, inner, where, order_by, order_type):
             join_lines = join_file.read().splitlines()
             try:
                 stmt = stmtToBool(where, cols1, table, cols2, inner)
-            except (ColumnError, TableError):
+            except ColumnError:
+                print("Una o mas de las columnas solicitadas no existen.\n")
+                return
+            except TableError:
+                print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
                 return
             for line in file:
                 row1 = line.strip().split(",")
                 for join_line in join_lines:
                     row2 = join_line.strip().split(",")
-                    if stmt(row1, row2):
+                    if stmt(row1, row2): #Si la fila junto a una fila cualquiera de la segunda tabla cumplen la condicion especificada en where
                         out.append(row1+row2)
-    cols = cols1+cols2
-
-    for (i, col) in enumerate(sel):
-        if col == '*':
-            sel = range(len(cols))
-            break
-        else:
-            try:
-                (t, sel[i]) = getIndex(col, cols1, cols2, table, inner)
-                if t == inner:
-                    sel[i] += len(cols1)
-            except (ColumnError, TableError):
-                return
-
-    if order_by:
-        try:
-            (*_, i) = getIndex(order_by, cols)
-        except (ColumnError, TableError):
-            return
-        out = sorted(out, key=lambda l: l[i])
-        if order_type == "DESC":
-            out = reversed(out)
 
     if not out:
         print("La informacion solicitada no existe.\n")
         return
+
+    cols = cols1+cols2
+    for (i, col) in enumerate(sel):
+        if col == '*': #Si la columna seleccionada es * entonces se deben mostar todas las columnas [0, 1, ..., Ncolumnas].
+            sel = range(len(cols))
+            break
+        else: #Si la columna no es * se remplaza en la lista por el indice que identifica a esta columna.
+            try:
+                (t, sel[i]) = getIndex(col, cols1, cols2, table, inner)
+                if t == inner: #Si enuentra el indice en la segunda lista de columnas se debe empezar a contar desde donde termina la primera.
+                    sel[i] += len(cols1)
+            except ColumnError:
+                print("Una o mas de las columnas solicitadas no existen.\n")
+                return
+            except TableError:
+                print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
+                return
+
+    if order_by:
+        try:
+            (*_, i) = getIndex(order_by, cols) #Busca el indice de la columna que se quiere ordenar.
+        except ColumnError:
+            print("Una o mas de las columnas solicitadas no existen.\n")
+            return
+        except TableError:
+            print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
+            return
+        out = sorted(out, key=lambda l: l[i])
+        if order_type == "DESC":
+            out = reversed(out)
 
     new_out = []
     max_lens = [0] * len(cols)
@@ -291,10 +304,10 @@ def select(sel, table, inner, where, order_by, order_type):
         l = []
         for col in sel:
             l.append(line[col])
-            max_lens[col] = max(max_lens[col], len(line[col]))
+            max_lens[col] = max(max_lens[col], len(line[col])) #Almacena el tamaño de la string mas larga para cada columna seleccionada.
         new_out.append(l)
 
-    row_format = ''.join("{:<"+str(max_lens[col]+2)+"}" for col in sel)
+    row_format = ''.join("{:<"+str(max_lens[col]+2)+"}" for col in sel) #Crea un formato para que cada columna tenga de ancho 2 caracteres mas que la string mas larga que contiene.
     print('', *[row_format.format(*list) for list in new_out] , '', sep='\n')
 
 '''
@@ -302,7 +315,7 @@ insert
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le insertará datos.
-(diccionario{columna:valor}) row_dat: Diccionario que contiene los datos que se ingresarán.
+(diccionario{string:string}) row_dat: Diccionario que contiene los datos que se ingresarán de la forma columna:valor.
 ——————–
 Salida:
 (void) Output: No retorna.
@@ -310,7 +323,6 @@ Salida:
 Añade una fila al final de la tabla entregada a la función con los datos que se han ingresado.
 '''
 def insert(table, row_dat):
-    cols = ""
     contador = 0
 
     try:
@@ -321,8 +333,8 @@ def insert(table, row_dat):
     else:
         with file:
             cols = file.readline().strip().split(",")
-    string = ""
 
+    string = ""
     with open(table+".csv", "a", encoding='utf-8-sig') as file:
         for col in cols:
             if col in row_dat:
@@ -332,7 +344,7 @@ def insert(table, row_dat):
                 string = string + "" + ","
         string = string[:-1] + "\n"
 
-        if len(row_dat) > contador:
+        if contador < len(row_dat): #Se actualizaron menos columnas que las indicadas.
             print("Una o mas de las columnas solicitadas no existen.\n")
             return
         else:
@@ -410,7 +422,7 @@ while running:
         where = select_match[8]
         order_by = select_match[10]
         order_type = select_match[11]
-        if inner and not where: #INNER JOIN sin un WHERE
+        if inner and not where:
             print("Error de Sintaxis!\n")
         else:
             select(sel, table, inner, where, order_by, order_type)
