@@ -65,8 +65,8 @@ Verifica si el string tiene el formato de una columna válida.
 def isColumn(str):
     return str[0].isalpha()
 
-def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
-    (table, col) = str.split('.') if hasTableName(str) else ("", str)
+def getIndex(col, cols1, cols2 = [], table1 = "", table2 = ""):
+    (table, col) = col.split('.') if hasTableName(col) else ("", col)
     if table is "" or table1 is "":
         try:
             return (table1, cols1.index(col))
