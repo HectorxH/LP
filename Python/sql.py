@@ -23,74 +23,19 @@ update_regex = re.compile(
 
 
 '''
-commaSplit
+splitter
 ——————–
 Entradas:
-(string) str: String entregado a la función.
+(string) str: String al cual se le quiere hacer split.
+(string) split_str: String por la cual se realizara el split.
 ——————–
 Salida:
-(lista) Output: Retorna una lista con los strings separados por comas ignorando espacios.
+(lista) Output: Retorna una lista con los strings separados por split_str ignorando espacios.
 ——————–
-Extrae del string entregado los strings entre comas y espacios.
+Extrae del string entregado los strings entre split_str y espacios.
 '''
-def commaSplit(str):
-    return re.split(r"'?(?: *),(?: *)'?", str.strip(" \n\'"))
-
-'''
-orSplit
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(lista) Output: Retorna una lista con los strings separados por OR ignorando espacios.
-——————–
-Extrae del string entregado los strings entre OR y espacios.
-'''
-def orSplit(str):
-    return re.split(r"(?: +)OR(?: +)", str.strip(" \n"))
-
-'''
-andSplit
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(lista) Output: Retorna una lista con los strings separados por AND ignorando espacios.
-——————–
-Extrae del string entregado los strings entre AND y espacios.
-'''
-def andSplit(str):
-    return re.split(r"(?: +)AND(?: +)", str.strip(" \n"))
-
-'''
-equalSplit
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(lista) Output: Retorna una lista con los strings separados por = ignorando espacios.
-——————–
-Extrae del string entregado los strings entre = y espacios.
-'''
-def equalSplit(str):
-    return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
-
-'''
-equalSplitVar
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(Tipo de dato) Output:
-——————–
-Descripción de la función.
-'''
-def equalSplitVar(str):
-    return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
+def splitter(str, split_str):
+    return re.split(r" *"+split_str+" *", str.strip(" \n"))
 
 '''
 hasTableName
@@ -120,20 +65,6 @@ Verifica si el string tiene el formato de una columna válida.
 def isColumn(str):
     return str[0].isalpha()
 
-'''
-isString
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(bool) Output: Retorna TRUE si es un string y FALSE si no lo es.
-——————–
-Verifica si el string contiene un ' para reconocer si hay un string.
-'''
-def isString(str):
-    return '\'' in str
-
 def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
     (table, col) = str.split('.') if hasTableName(str) else ("", str)
     if table is "" or table1 is "":
@@ -161,7 +92,7 @@ def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
         print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen")
         raise TableError
 
-        
+
 '''
 check
 ——————–
@@ -180,9 +111,9 @@ TRUE o FALSE si cumple esta condición o no.
 '''
 
 def check(subexpr, cols1, table1 = "", cols2 = [], table2 = ""):
-    (A, B) = equalSplit(subexpr)
+    (A, B) = splitter(subexpr, '=')
     if not cols2:
-        B.strip('\'')
+        B = B.strip('\'')
         (*_, pos) = getIndex(A, cols1)
         return lambda row: row[pos] == B;
     else:
@@ -224,7 +155,7 @@ Salida:
 Recibe un string que lo separa por AND. Luego llama a la función check y le entrega cada uno de estos strings.
 '''
 def exprToBool(expr, cols1, table1 = "", cols2 = [], table2 = ""):
-    expr = andSplit(expr)
+    expr = splitter(expr, "AND")
     expr = [check(subexpr, cols1, table1, cols2, table2) for subexpr in expr]
     if not cols2:
         return lambda row: all([subexpr(row) for subexpr in expr])
@@ -247,7 +178,7 @@ Salida:
 Recibe la condición para WHERE y retorna una función que se evalúa en TRUE o FALSE si cumple esta condición o no.
 '''
 def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
-    stmt = orSplit(stmt)
+    stmt = splitter(stmt, "OR")
     stmt = [exprToBool(expr, cols1, table1, cols2, table2) for expr in stmt]
     if not cols2:
         return lambda row: any([expr(row) for expr in stmt])
@@ -347,7 +278,7 @@ def select(sel, table, inner, where, order_by, order_type):
             max_lens[col] = max(max_lens[col], len(line[col]))
         new_out.append(l)
 
-    row_format = ''.join("{:<"+str(max_lens[col]+1)+"}" for col in sel)
+    row_format = ''.join("{:<"+str(max_lens[col]+2)+"}" for col in sel)
     print('', *[row_format.format(*list) for list in new_out] , '', sep='\n')
 
 '''
@@ -457,7 +388,7 @@ while running:
     update_match = re.fullmatch(update_regex, query)
 
     if select_match:
-        sel = comaSplit(select_match[2])
+        sel = splitter(select_match[2], ',')
         table = select_match[4]
         inner = select_match[6]
         where = select_match[8]
@@ -469,8 +400,8 @@ while running:
             select(sel, table, inner, where, order_by, order_type)
     elif insert_match:
         table = insert_match[2]
-        keys = commaSplit(insert_match[3])
-        values = commaSplit(insert_match[5])
+        keys = splitter(insert_match[3], ',')
+        values = splitter(insert_match[5], ',')
 
         if len(keys) != len(values):
             print("Error de Sintaxis!")
@@ -480,7 +411,7 @@ while running:
 
     elif update_match:
         table = update_match[2]
-        set = equalSplit(update_match[4])
+        set = splitter(update_match[4], '=')
         stmt = update_match[6]
         update(table, set, stmt)
 
