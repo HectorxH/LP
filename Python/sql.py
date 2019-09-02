@@ -27,10 +27,11 @@ splitter
 ——————–
 Entradas:
 (string) str: String al cual se le quiere hacer split.
-(string) split_str: String por la cual se realizara el split.
+(string) split_str: String por el cual se realizara el split.
 ——————–
 Salida:
-(lista) Output: Retorna una lista con los strings separados por split_str ignorando espacios.
+(lista[string]) Output: Retorna una lista con los strings separados por split_str ignorando espacios.
+
 ——————–
 Extrae del string entregado los strings entre split_str y espacios.
 '''
@@ -65,8 +66,25 @@ Verifica si el string tiene el formato de una columna válida.
 def isColumn(str):
     return str[0].isalpha()
 
-def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
-    (table, col) = str.split('.') if hasTableName(str) else ("", str)
+
+'''
+getIndex
+——————–
+Entradas:
+(string) col: String de la forma nombreColumna o nombreTabla.nombreColumna
+(string) cols1: Rótulos de la tabla correspondiente a table1.
+(string) cols2: Rótulos de la tabla correspondiente a table2.
+(string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
+(string) table2: Nombre de la segunda tabla.
+——————–
+Salida:
+(tupla(string, int)) Output: Retorna una tupla con el nombre de la tabla en la que se encuentra y la posición
+en la que se encuentra.
+——————–
+Busca en cuál tabla se encuentra la columna col y su número de columna, retornándolo como una tupla.
+'''
+def getIndex(col, cols1, cols2 = [], table1 = "", table2 = ""):
+    (table, col) = col.split('.') if hasTableName(col) else ("", col)
     if table is "" or table1 is "":
         try:
             return (table1, cols1.index(col))
