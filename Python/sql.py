@@ -114,9 +114,9 @@ check
 ——————–
 Entradas:
 (string) subexpr: Condición de la forma columna = valor o columna = columna.
-(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(lista[strings]) cols1: Rótulos de la tabla correspondiente a table1.
 (string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
-(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(lista[strings]) cols2: Rótulos de la tabla correspondiente a table2.
 (string) table2: Nombre de la segunda tabla.
 ——————–
 Salida:
@@ -160,9 +160,9 @@ exprToBool
 ——————–
 Entradas:
 (string) expr: Condición que solo puede contener AND.
-(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(lista[strings]) cols1: Rótulos de la tabla correspondiente a table1.
 (string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
-(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(lista[strings]) cols2: Rótulos de la tabla correspondiente a table2.
 (string) table2: Nombre de la segunda tabla.
 ——————–
 Salida:
@@ -183,9 +183,9 @@ stmtToBool
 ——————–
 Entradas:
 (string) stmt: Condición ingresada para WHERE.
-(lista) cols1: Rótulos de la tabla correspondiente a table1.
+(lista[strings]) cols1: Rótulos de la tabla correspondiente a table1.
 (string) table1: Nombre de una tabla (se requiere cuando hay más de una tabla), por defecto es un string vacío.
-(lista) cols2: Rótulos de la tabla correspondiente a table2.
+(lista[strings]) cols2: Rótulos de la tabla correspondiente a table2.
 (string) table2: Nombre de la segunda tabla.
 ——————–
 Salida:
@@ -205,7 +205,7 @@ def stmtToBool(stmt, cols1, table1 = "", cols2 = [], table2 = ""):
 select
 ——————–
 Entradas:
-(lista) sel: Lista de columnas que se quieren mostrar, contiene solo '*' si se quieren mostrar todas las columnas.
+(lista[string]) sel: Lista de columnas que se quieren mostrar, contiene solo '*' si se quieren mostrar todas las columnas.
 (string) table: Tabla a la que se le quiere hacer SELECT.
 (string) inner: Tabla a la que se le quiere hacer INNER JOIN.
 (string) where: Condición para WHERE.
@@ -302,7 +302,7 @@ insert
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le insertará datos.
-(diccionario{columna;valor}) row_dat: Diccionario que contiene los datos que se ingresarán.
+(diccionario{columna:valor}) row_dat: Diccionario que contiene los datos que se ingresarán.
 ——————–
 Salida:
 (void) Output: No retorna.
@@ -345,7 +345,7 @@ update
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le actualizarán los datos.
-(lista{string}) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
+(lista[string]) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
 (string) stmt: Condición que se debe cumplir para cambiar el valor que corresponde a esa fila.
 ——————–
 Salida:
