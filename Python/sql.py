@@ -79,20 +79,6 @@ def equalSplit(str):
     return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
 
 '''
-equalSplitVar
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(Tipo de dato) Output:
-——————–
-Descripción de la función.
-'''
-def equalSplitVar(str):
-    return re.split(r"(?: *)=(?: *)", str.strip(" \n"))
-
-'''
 hasTableName
 ——————–
 Entradas:
@@ -119,20 +105,6 @@ Verifica si el string tiene el formato de una columna válida.
 '''
 def isColumn(str):
     return str[0].isalpha()
-
-'''
-isString
-——————–
-Entradas:
-(string) str: String entregado a la función.
-——————–
-Salida:
-(bool) Output: Retorna TRUE si es un string y FALSE si no lo es.
-——————–
-Verifica si el string contiene un ' para reconocer si hay un string.
-'''
-def isString(str):
-    return '\'' in str
 
 def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
     (table, col) = str.split('.') if hasTableName(str) else ("", str)
@@ -161,7 +133,7 @@ def getIndex(str, cols1, cols2 = [], table1 = "", table2 = ""):
         print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen")
         raise TableError
 
-        
+
 '''
 check
 ——————–
