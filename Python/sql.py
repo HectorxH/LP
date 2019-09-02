@@ -92,22 +92,22 @@ def getIndex(col, cols1, cols2 = [], table1 = "", table2 = ""):
             try:
                 return (table2, cols2.index(col))
             except:
-                print("Una o mas de las columnas solicitadas no existen.")
+                print("Una o mas de las columnas solicitadas no existen.\n")
                 raise ColumnError
     elif table == table1:
         try:
             return (table, cols1.index(col))
         except:
-            print("Una o mas de las columnas solicitadas no existen.")
+            print("Una o mas de las columnas solicitadas no existen.\n")
             raise ColumnError
     elif table == table2:
         try:
             return (table, cols2.index(col))
         except:
-            print("Una o mas de las columnas solicitadas no existen.")
+            print("Una o mas de las columnas solicitadas no existen.\n")
             raise ColumnError
     else:
-        print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen")
+        print("Una o mas de las columnas de forma nombreTabla.nombreColumna no existen\n")
         raise TableError
 
 
@@ -228,7 +228,7 @@ def select(sel, table, inner, where, order_by, order_type):
     try:
         file = open(table+".csv", 'r', encoding="utf-8-sig");
     except FileNotFoundError:
-        print("La tabla solicitada no existe.")
+        print("La tabla solicitada no existe.\n")
         return
     if not inner:
         with file:
@@ -245,7 +245,7 @@ def select(sel, table, inner, where, order_by, order_type):
         try:
             join_file = open(inner+".csv", 'r', encoding="utf-8-sig")
         except FileNotFoundError:
-            print("La tabla solicitada en INNER JOIN no existe.")
+            print("La tabla solicitada en INNER JOIN no existe.\n")
         with file, join_file:
             cols1 = file.readline().strip().split(",")
             cols2 = join_file.readline().strip().split(",")
@@ -284,7 +284,7 @@ def select(sel, table, inner, where, order_by, order_type):
             out = reversed(out)
 
     if not out:
-        print("La informacion solicitada no existe.")
+        print("La informacion solicitada no existe.\n")
         return
 
     new_out = []
@@ -318,7 +318,7 @@ def insert(table, row_dat):
     try:
         file = open(table+".csv", "r", encoding='utf-8-sig')
     except FileNotFoundError:
-        print("La tabla solicitada no existe.")
+        print("La tabla solicitada no existe.\n")
         return
     else:
         with file:
@@ -335,12 +335,12 @@ def insert(table, row_dat):
         string = string[:-1] + "\n"
 
         if len(row_dat) > contador:
-            print("No se pudo ingresar uno de los datos ya que no existe su columna respectiva.")
+            print("Una o mas de las columnas solicitadas no existen.\n")
             return
         else:
             file.write(string)
 
-    print("Se ha insertado 1 fila.")
+    print("\nSe ha insertado 1 fila.\n")
 
 '''
 update
@@ -361,7 +361,7 @@ def update(table, set, stmt):
     try:
         file = open(table+".csv", "r", encoding='utf-8-sig')
     except FileNotFoundError:
-        print("La tabla solicitada no existe.")
+        print("La tabla solicitada no existe.\n")
         return
     else:
         with file:
@@ -372,7 +372,7 @@ def update(table, set, stmt):
         try:
             set[0] = cols.index(set[0])
         except ValueError:
-            print("Una columna indicada no existe.")
+            print("Una columna indicada no existe.\n")
             for line in lines:
                 file.write(','.join(line)+'\n')
             return
@@ -390,11 +390,11 @@ def update(table, set, stmt):
             file.write(line)
 
     if count == 0:
-        print("No se han actualizado filas.")
+        print("\nNo se han actualizado filas.\n")
     elif count == 1:
-        print("Se ha actualizado 1 fila.")
+        print("\nSe ha actualizado 1 fila.\n")
     else:
-        print("Se han actualizado {} filas.".format(count))
+        print("\nSe han actualizado {} filas.\n".format(count))
 
 running = True
 print("Para salir ingrese el comando EXIT;")
@@ -413,7 +413,7 @@ while running:
         order_by = select_match[10]
         order_type = select_match[11]
         if inner and not where: #INNER JOIN sin un WHERE
-            print("Error de Sintaxis!")
+            print("Error de Sintaxis!\n")
         else:
             select(sel, table, inner, where, order_by, order_type)
     elif insert_match:
@@ -422,7 +422,7 @@ while running:
         values = splitter(insert_match[5], ',')
 
         if len(keys) != len(values):
-            print("Error de Sintaxis!")
+            print("Error de Sintaxis!\n")
         else:
             row_dat = dict(zip(keys,values))
             insert(table, row_dat)
@@ -436,4 +436,4 @@ while running:
     elif query == "EXIT;":
         running = False
     else:
-        print("Error de Sintaxis!")
+        print("Error de Sintaxis!\n")
