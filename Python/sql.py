@@ -31,6 +31,7 @@ Entradas:
 ——————–
 Salida:
 (lista[string]) Output: Retorna una lista con los strings separados por split_str ignorando espacios.
+
 ——————–
 Extrae del string entregado los strings entre split_str y espacios.
 '''
@@ -64,6 +65,7 @@ Verifica si el string tiene el formato de una columna válida.
 '''
 def isColumn(str):
     return str[0].isalpha()
+
 
 '''
 getIndex
