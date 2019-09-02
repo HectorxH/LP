@@ -27,11 +27,10 @@ splitter
 ——————–
 Entradas:
 (string) str: String al cual se le quiere hacer split.
-(string) split_str: String por el cual se realizara el split.
+(string) split_str: String por el cual se realizará el split.
 ——————–
 Salida:
 (lista[string]) Output: Retorna una lista con los strings separados por split_str ignorando espacios.
-
 ——————–
 Extrae del string entregado los strings entre split_str y espacios.
 '''
@@ -47,7 +46,7 @@ Entradas:
 Salida:
 (bool) Output: Retorna TRUE si contiene . y FALSE si no.
 ——————–
-Verifica si el string contiene un . para reconocer si para reconocer si es de la forma nombreTabla.nombreColumna
+Verifica si el string contiene un . para reconocer si es de la forma nombreTabla.nombreColumna
 '''
 def hasTableName(str):
     return '.' in str
@@ -65,7 +64,6 @@ Verifica si el string tiene el formato de una columna válida.
 '''
 def isColumn(str):
     return str[0].isalpha()
-
 
 '''
 getIndex
@@ -212,12 +210,12 @@ Entradas:
 (string) inner: Tabla a la que se le quiere hacer INNER JOIN.
 (string) where: Condición para WHERE.
 (string) order_by: Columna que se quiere ordenar.
-(string) order_type: Ordenar de manera adcendente o descendente.
+(string) order_type: Especifica si se quiere ordenar de manera adcendente o descendente.
 ——————–
 Salida:
 (void) Output: No retorna.
 ——————–
-Imprime los datos de la tabla que son especificados.
+Imprime los datos de la tabla que son seleccionados.
 Puede juntar columnas de distintas tablas y ordenarlas de forma ascendente y descendente.
 '''
 def select(sel, table, inner, where, order_by, order_type):
@@ -304,7 +302,7 @@ insert
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le insertará datos.
-(diccionario) row_dat: Diccionario que contiene los datos que se ingresarán.
+(diccionario{columna;valor}) row_dat: Diccionario que contiene los datos que se ingresarán.
 ——————–
 Salida:
 (void) Output: No retorna.
@@ -347,7 +345,7 @@ update
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le actualizarán los datos.
-(lista de strings) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
+(lista{string}) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
 (string) stmt: Condición que se debe cumplir para cambiar el valor que corresponde a esa fila.
 ——————–
 Salida:
