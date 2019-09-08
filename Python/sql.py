@@ -419,7 +419,7 @@ def update(table, set, stmt):
         for line in lines:
             line = line.strip().split(",")
             if stmt(line):
-                line[set[0]] = set[1]
+                line[set[0]] = set[1].strip("'")
                 count += 1
             line = ','.join(line)+'\n'
             file.write(line)
