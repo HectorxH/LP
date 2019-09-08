@@ -79,7 +79,7 @@ Entradas:
 Salida:
 (tupla(string, int)) Output: Retorna una tupla con el nombre de la tabla en la que se encuentra y su posición.
 ——————–
-Busca en cuál tabla se encuentra la columna col y su número de columna, retornándolo como una tupla.
+Busca en cual tabla se encuentra la columna col y su número de columna, retornándolo como una tupla.
 '''
 def getIndex(col, cols1, cols2 = [], table1 = "", table2 = ""):
     (table, col) = col.split('.') if hasTableName(col) else ("", col)
