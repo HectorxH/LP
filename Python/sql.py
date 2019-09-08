@@ -382,7 +382,7 @@ update
 ——————–
 Entradas:
 (string) table: Nombre de la tabla a la que se le actualizarán los datos.
-(lista[string]) set: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
+(lista[string]) set_value: Lista con el nombre de la columna que se quiere cambiar junto con el valor al cual se quiere actualizar.
 (string) stmt: Condición que se debe cumplir para cambiar el valor que corresponde a esa fila.
 ——————–
 Salida:
@@ -390,7 +390,7 @@ Salida:
 ——————–
 Actualiza la tabla entregada a la función con los valores han sido ingresados.
 '''
-def update(table, set, stmt):
+def update(table, set_value, stmt):
     count = 0
 
     try:
@@ -405,12 +405,22 @@ def update(table, set, stmt):
     with open(table+".csv", "w", encoding='utf-8-sig') as file:
         cols = lines[0].strip().split(",")
         try:
-            for (i, s) in enumerate(set):
+            only_once = set()
+            for (i, s) in enumerate(set_value):
                 s = splitter(s, "=")
                 s[0] = cols.index(s[0])
-                set[i] = s
+                if s[0] not in only_once:
+                    only_once.add(s[0])
+                    set_value[i] = s
+                else:
+                    raise ColumnError;
         except ValueError:
             print("Una columna indicada no existe.\n")
+            for line in lines:
+                file.write(line+'\n')
+            return
+        except ColumnError:
+            print("No es posible cambiar una misma columna más de una vez por query.\n")
             for line in lines:
                 file.write(line+'\n')
             return
@@ -422,7 +432,7 @@ def update(table, set, stmt):
         for line in lines:
             line = line.strip().split(",")
             if stmt(line):
-                for pos, value in set:
+                for pos, value in set_value:
                     line[pos] = value.strip("'")
                 count += 1
             line = ','.join(line)+'\n'
@@ -468,9 +478,9 @@ while running:
 
     elif update_match:
         table = update_match[2]
-        set = splitter(update_match[4], ',')
+        set_value = splitter(update_match[4], ',')
         stmt = update_match[6]
-        update(table, set, stmt)
+        update(table, set_value, stmt)
 
     elif query == "EXIT;":
         running = False
