@@ -363,7 +363,7 @@ def insert(table, row_dat):
     with open(table+".csv", "a", encoding='utf-8-sig') as file:
         for col in cols:
             if col in row_dat:
-                string = string + row_dat[col].strip("''") + ","
+                string = string + row_dat[col].strip("'") + ","
                 contador+=1
             else:
                 string = string + "" + ","
@@ -405,11 +405,14 @@ def update(table, set, stmt):
     with open(table+".csv", "w", encoding='utf-8-sig') as file:
         cols = lines[0].strip().split(",")
         try:
-            set[0] = cols.index(set[0])
+            for (i, s) in enumerate(set):
+                s = splitter(s, "=")
+                s[0] = cols.index(s[0])
+                set[i] = s
         except ValueError:
             print("Una columna indicada no existe.\n")
             for line in lines:
-                file.write(','.join(line)+'\n')
+                file.write(line+'\n')
             return
         try:
             stmt = stmtToBool(stmt, cols)
@@ -419,7 +422,8 @@ def update(table, set, stmt):
         for line in lines:
             line = line.strip().split(",")
             if stmt(line):
-                line[set[0]] = set[1].strip("'")
+                for pos, value in set:
+                    line[pos] = value.strip("'")
                 count += 1
             line = ','.join(line)+'\n'
             file.write(line)
@@ -464,7 +468,7 @@ while running:
 
     elif update_match:
         table = update_match[2]
-        set = splitter(update_match[4], '=')
+        set = splitter(update_match[4], ',')
         stmt = update_match[6]
         update(table, set, stmt)
 
