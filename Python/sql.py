@@ -8,19 +8,21 @@ class TableError(Exception):
     pass
 
 select_regex = re.compile(
-    r"^(SELECT) +((?:[a-zA-Z][^\s,='*]*?(?: *, *[a-zA-Z][^\s,='*]*?)*)|\*) +"
-    r"(FROM) +([a-zA-Z][^\s,='*]*?)"
-    r"(?: +(INNER JOIN) +([a-zA-Z][^\s,='*]*?))?"
-    r"(?: +(WHERE) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?"
-    r"(?: +(ORDER BY) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)?) +(ASC|DESC))?;$")
+    r"^(SELECT) +((?:[a-zA-Z][^\s,='*;.]*?(?: *, *[a-zA-Z][^\s,='*;.]*?)*)|\*) +"
+    r"(FROM) +([a-zA-Z][^\s,='*;.]*?)"
+    r"(?: +(INNER JOIN) +([a-zA-Z][^\s,='*;.]*?))?"
+    r"(?: +(WHERE) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)?|-?\d+(?:\.\d+)?|'[^']*') *(?: +(?:AND|OR) +[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)?|-?\d+(?:\.\d+)?|'[^']*'))*))?"
+    r"(?: +(ORDER BY) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)?) +(ASC|DESC))?;$")
 insert_regex = re.compile(
-    r"^(INSERT INTO) +([a-zA-Z][^\s,='*]*?) +\( *([a-zA-Z][^\s,='*]*?(?: *, *[a-zA-Z][^\s,='*]*?)*) *\) +"
+    r"^(INSERT INTO) +([a-zA-Z][^\s,='*;.]*?) +\( *([a-zA-Z][^\s,='*;.]*?(?: *, *[a-zA-Z][^\s,='*;.]*?)*) *\) +"
     r"(VALUES) +\( *((?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *(?:-?\d+(?:\.\d+)?|'[^']*'))*) *\);$")
 update_regex = re.compile(
-    r"^(UPDATE) +([a-zA-Z][^\s,='*]*?) +"
-    r"(SET) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
-    r"(WHERE) +([a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: +(?:AND|OR) +[a-zA-Z][^\s,='*]*?(?:\.[a-zA-Z][^\s,='*]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
-
+    r"^(UPDATE) +([a-zA-Z][^\s,='*;.]*?) +"
+    r"(SET) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
+    r"(WHERE) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*') *?(?: +(?:AND|OR) +[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
+colcol = re.compile(
+    r"[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)? *= *[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)? *(?:AND|OR|ORDER BY)?"
+)
 
 '''
 splitter
@@ -225,6 +227,10 @@ def select(sel, table, inner, where, order_by, order_type):
         print("La tabla solicitada no existe.\n")
         return
     if not inner:
+        conditions = re.findall(colcol, where) if where else []
+        if conditions:
+            print("Expresion de la forma Columna = Columna sin la presencia de un INNER JOIN\n")
+            return
         with file:
             cols1 = file.readline().strip().split(",")
             try:
@@ -241,6 +247,10 @@ def select(sel, table, inner, where, order_by, order_type):
                 if stmt(row): #Si la fila cumple la condicion especificada en WHERE
                     out.append(row)
     else:
+        conditions = re.findall(colcol, where)
+        if not conditions:
+            print("INNER JOIN requiere de una exprecion de la forma Columna = Columna en WHERE.\n")
+            return
         try:
             join_file = open(inner+".csv", 'r', encoding="utf-8-sig")
         except FileNotFoundError:
@@ -271,7 +281,24 @@ def select(sel, table, inner, where, order_by, order_type):
     cols = cols1+cols2
     for (i, col) in enumerate(sel):
         if col == '*': #Si la columna seleccionada es * entonces se deben mostar todas las columnas [0, 1, ..., Ncolumnas].
-            sel = range(len(cols))
+            sel = list(range(len(cols)))
+            if inner:
+                s = set()
+                for condition in conditions:
+                    col1, col2 = splitter(condition, '=')
+                    if hasTableName(col1):
+                        *_, col1 = col1.split('.')
+                    if hasTableName(col2):
+                        *_, col2 = col2.split('.')
+                    if col1 == col2:
+                        *_, pos1 = getIndex(col1,cols)
+                        *_, pos2 = getIndex(col1, cols[pos1+1:])
+                        pos2 += pos1+1
+                    else:
+                        *_, pos2 = getIndex(col2, cols)
+                    if pos2 not in s:
+                        s.add(pos2)
+                        del sel[pos2]
             break
         else: #Si la columna no es * se remplaza en la lista por el indice que identifica a esta columna.
             try:
