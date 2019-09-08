@@ -363,7 +363,7 @@ def insert(table, row_dat):
     with open(table+".csv", "a", encoding='utf-8-sig') as file:
         for col in cols:
             if col in row_dat:
-                string = string + row_dat[col] + ","
+                string = string + row_dat[col].strip("''") + ","
                 contador+=1
             else:
                 string = string + "" + ","
