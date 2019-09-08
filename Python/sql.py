@@ -20,7 +20,7 @@ update_regex = re.compile(
     r"(SET) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*')(?: *, *[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*) +"
     r"(WHERE) +([a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*') *?(?: +(?:AND|OR) +[a-zA-Z][^\s,='*;.]*?(?:\.[a-zA-Z][^\s,='*;.]*?)? *= *(?:-?\d+(?:\.\d+)?|'[^']*'))*);$")
 colcol = re.compile(
-    r"[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)? *= *[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)? *(?:AND|OR|ORDER BY)?"
+    r"[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)? *= *[a-zA-Z][^\s,='*;.]*(?:\.[a-zA-Z][^\s,='*;.]*)?"
 )
 
 '''
@@ -247,7 +247,7 @@ def select(sel, table, inner, where, order_by, order_type):
     else:
         conditions = re.findall(colcol, where)
         if not conditions:
-            print("INNER JOIN requiere de una expresión de la forma Columna = Columna en WHERE.\n")
+            print("INNER JOIN requiere de al menos una expresión de la forma Columna = Columna en WHERE.\n")
             return
         try:
             join_file = open(inner+".csv", 'r', encoding="utf-8-sig")
@@ -296,7 +296,7 @@ def select(sel, table, inner, where, order_by, order_type):
                         *_, pos2 = getIndex(col2, cols)
                     if pos2 not in s:
                         s.add(pos2)
-                        del sel[pos2]
+                        sel.remove(pos2)
             break
         else: #Si la columna no es * se reemplaza en la lista por el índice que identifica a esta columna.
             try:
