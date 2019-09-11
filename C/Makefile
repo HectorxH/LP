@@ -1,19 +1,23 @@
-CFLAGS= -Wall -Wextra -Wpointer-arith -g
+TARGET = main.c
+
+CFLAGS = -Wall -Wextra -Wpointer-arith -g
 CC = gcc
 
 SRCS := $(wildcard *.c)
 HEADERS := $(wildcard *.h)
 OBJECTS := $(SRCS:%.c=%.o)
-BINS := $(SRCS:%.c=%.out)
+BINS := $(TARGET:%.c=%.out)
 
 all: $(BINS)
 
 .PHONY: all clean
 
-%.o: %.c
-	$(CC) -c $<
+%.o: $(SRCS) $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-%.out: %.o
+.PRECIOUS: $(BINS) $(TARGET) $(OBJECTS)
+
+$(BINS): $(TARGET) $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
