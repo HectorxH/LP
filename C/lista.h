@@ -1,10 +1,6 @@
 #ifndef lista
 #define lista
 
-struct list;
-struct node;
-struct data;
-
 typedef struct list list;
 typedef struct node node;
 typedef struct data data;
