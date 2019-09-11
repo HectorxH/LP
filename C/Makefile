@@ -1,20 +1,20 @@
-CFLAGS= -Wall -Wextra -Wpointr-arith -g
+CFLAGS= -Wall -Wextra -Wpointer-arith -g
 CC = gcc
 
 SRCS := $(wildcard *.c)
 HEADERS := $(wildcard *.h)
 OBJECTS := $(SRCS:%.c=%.o)
-BINS := $(SRCS:%.c=%)
+BINS := $(SRCS:%.c=%.out)
 
 all: $(BINS)
 
 .PHONY: all clean
 
-%: %.o
-	$(CC) $(CFLAGS) $< -o $@.out
-
 %.o: %.c
-	$(CC) -c $< $@.o
+	$(CC) -c $<
+
+%.out: %.o
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf *.o $(BINS)
