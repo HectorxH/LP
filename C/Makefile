@@ -12,13 +12,13 @@ all: $(BINS)
 
 .PHONY: all clean
 
-%.o: $(SRCS) $(HEADERS)
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(BINS) $(TARGET) $(OBJECTS)
 
-$(BINS): $(TARGET) $(OBJECTS)
-	$(CC) $(CFLAGS) $< -o $@
+$(BINS): $(OBJECTS) $(HEADERS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
 	rm -rf *.o $(BINS)
