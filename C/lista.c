@@ -38,7 +38,8 @@ void clear(list* l){
     node* prev = l->head;
     l->actual = prev->next;
     while(l->actual != l->tail){
-        free((void*)prev->info.contenido);
+        if(prev->info.tipo == 'l') clear((list*)prev->info.contenido);
+        else free((void*)prev->info.contenido);
         free((void*)prev);
         prev = l->actual;
         l->actual = l->actual->next;
@@ -54,7 +55,8 @@ void insert(list* l, int i, data d){
         l->actual = l->actual->next;
     node* temp = l->actual->next;
     l->actual->next = (node*)malloc(sizeof(node));
-    l->actual->next->info = d;
+    l->actual->next->info.contenido = d.contenido;
+    l->actual->next->info.tipo = d.tipo;
     l->actual->next->next = temp;
     l->length++;
     return;
@@ -63,6 +65,9 @@ void insert(list* l, int i, data d){
 void append(list* l, data d){
     l->tail->next = (node*)malloc(sizeof(node));
     l->tail = l->tail->next;
+    l->tail->info.contenido = d.contenido;
+    l->tail->info.tipo = d.tipo;
+    l->tail->next = NULL;
     l->length++;
     return;
 }
@@ -74,7 +79,9 @@ void remove(list* l, int i){
         l->actual = l->actual->next;
     if(i == l->length-1){ //Remove at tail
         l->tail = l->actual;
-        free((void*)l->actual);
+        if(l->actual->next->info.tipo == 'l') clear((list*)l->actual->next->info.contenido);
+        else free(l->actual->next->info.contenido);
+        free((void*)l->actual->next);
         l->length--;
         return;
     }

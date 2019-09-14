@@ -15,9 +15,9 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.PRECIOUS: $(BINS) $(TARGET) $(OBJECTS)
+#.PRECIOUS: $(BINS) $(TARGET) $(OBJECTS)
 
-$(BINS): $(OBJECTS) $(HEADERS)
+%.out: $(OBJECTS) $(HEADERS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
