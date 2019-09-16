@@ -1,26 +1,9 @@
 #include <stdlib.h>
 #include "lista.h"
 
-struct data{
-    void* contenido;
-    char tipo;
-};
-
-struct node{
-    struct data info;
-    struct node* next;
-};
-
-struct list{
-    struct node* actual;
-    struct node* head;
-    struct node* tail;
-    int length;
-};
-
 typedef struct list list;
 typedef struct node node;
-typedef struct data data;
+typedef struct dato data;
 
 void init(list* l){
     l->head = l->tail = l->actual = (node*)malloc(sizeof(node));
