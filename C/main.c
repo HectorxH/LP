@@ -5,9 +5,9 @@
 typedef struct list list;
 
 int main(){
-    printf("Wena");
+    printf("Nice");
     printf("xd2");
     printf("lol");
-    printf("xd3");
+    printf("listo");
     return 0;
 }
