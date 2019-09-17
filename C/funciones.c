@@ -13,7 +13,7 @@ float sum(struct list* a){
   float total = 0;
   int len = lenght(a);
   for (i=0; i<len; i++){
-    dato = at(a, i);
+    struct dato = at(a, i);
     char tipo_d = dato.tipo;
     void* cont_d = dato.contenido;
     if(tipo_d == 'l'){
@@ -36,7 +36,7 @@ void print(struct list* a){
   float flotante;
   printf("[");
   for(i=0; i<len; i++){
-    dato = at(a, i);
+    struct dato = at(a, i);
     char tipo_d = dato.tipo;
     void* cont_d = dato.contenido;
     if(tipo_d == 'l'){
@@ -48,7 +48,7 @@ void print(struct list* a){
     }
     else if(tipo_d == 'f'){
       flotante = (float)cont_d;
-      printf("%d", &flotante);
+      printf("%f", &flotante);
     }
     i++;
   }
@@ -62,7 +62,7 @@ float average(struct list* a){
   float suma = 0;
   float prom;
   for (i=0; i<len; i++){
-    dato = at(a, i);
+    struct dato = at(a, i);
     char tipo_d = dato.tipo;
     void* cont_d = dato.contenido;
     if(tipo_d == 'l'){
