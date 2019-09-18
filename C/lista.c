@@ -3,7 +3,7 @@
 
 typedef struct list list;
 typedef struct node node;
-typedef struct dato data;
+typedef struct dato dato;
 
 void init(list* l){
     l->head = l->tail = l->actual = (node*)malloc(sizeof(node));
@@ -31,7 +31,7 @@ void clear(list* l){
     return free((void*)l);
 }
 
-void insert(list* l, int i, data d){
+void insert(list* l, int i, dato d){
     if(i >= l->length || i < 0) return;  //Invalid insert
     l->actual = l->head;
     for(int pos = 0; pos < i; i++)
@@ -45,7 +45,7 @@ void insert(list* l, int i, data d){
     return;
 }
 
-void append(list* l, data d){
+void append(list* l, dato d){
     l->tail->next = (node*)malloc(sizeof(node));
     l->tail = l->tail->next;
     l->tail->info.contenido = d.contenido;
@@ -69,6 +69,8 @@ void remove(list* l, int i){
         return;
     }
     node* temp = l->actual->next->next;
+    if(l->actual->next->info.tipo == 'l') clear((list*)l->actual->next->info.contenido);
+    else free(l->actual->next->info.contenido);
     free((void*)l->actual->next);
     l->actual->next = temp;
     l->length--;
@@ -79,7 +81,7 @@ int length(list* l){
     return l->length;
 }
 
-data* at(list* l, int i){
+dato* at(list* l, int i){
     if(i >= l->length || i < 0) return &(l->head->info);  //Invalid insert
     l->actual = l->head;
     for(int pos = 0; pos < i; i++)

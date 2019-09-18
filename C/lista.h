@@ -20,20 +20,20 @@ struct list{
 
 typedef struct list list;
 typedef struct node node;
-typedef struct dato data;
+typedef struct dato dato;
 
-void init(list* l);
+void init(list* a);
 
-void clear(list* l);
+void clear(list* a);
 
-void insert(list* l, int i, data d);
+void insert(list* a, int i, dato d);
 
-void append(list* l, data d);
+void append(list* a, dato d);
 
-void remv(list* l, int i);
+void remv(list* a, int i);
 
-int length(list* l);
+int length(list* a);
 
-data* at(list*l, int i);
+dato* at(list*a, int i);
 
 #endif
