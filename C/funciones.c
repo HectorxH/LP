@@ -30,9 +30,9 @@ float sum(list* a){
         if(tipo_d == 'l')
             total += sum((list*)d->contenido);
             else if(tipo_d == 'i')
-            total += *((int*)d->contenido);
+            total += *(int*)d->contenido;
         else if(tipo_d == 'f')
-            total += *((float*)d->contenido);
+            total += *(float*)d->contenido;
     }
     return total;
 }
@@ -47,9 +47,9 @@ void print_aux(list* a){
         if(tipo_d == 'l')
             print((list*)d->contenido);
         else if(tipo_d == 'i')
-            printf("%d", *((int*)d->contenido));
+            printf("%d", *(int*)d->contenido);
         else if(tipo_d == 'f')
-            printf("%f", *((float*)d->contenido));
+            printf("%f", *(float*)d->contenido);
         if (i != len-1)
             printf(", ");
     }
@@ -67,9 +67,9 @@ void print(list* a){
         if(tipo_d == 'l')
             print_aux((list*)d->contenido);
         else if(tipo_d == 'i')
-            printf("%d", *((int*)d->contenido));
+            printf("%d", *(int*)d->contenido);
         else if(tipo_d == 'f')
-            printf("%f", *((float*)d->contenido));
+            printf("%f", *(float*)d->contenido);
         if (i != len-1)
             printf(", ");
     }
@@ -88,9 +88,9 @@ float average(list* a){
             if(length((list*)d->contenido) == 0) n--;
             else suma += average((list*)d->contenido);
         else if(tipo_d == 'i')
-            suma += *((int*)d->contenido);
+            suma += *(int*)d->contenido;
         else if(tipo_d == 'f')
-            suma += *((float*)d->contenido);
+            suma += *(float*)d->contenido;
     }
     return suma/len;
 }

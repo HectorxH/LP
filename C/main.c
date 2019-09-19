@@ -7,16 +7,23 @@ typedef struct list list;
 
 int main(){
     dato dato1;
+    int a = 20;
     dato1.tipo = 'i';
-    dato1.contenido = (void*)malloc(sizeof(int));
-    *((int*)dato1.contenido) = 20;
+    dato1.contenido = &a;
 
     list l;
     init(&l);
+
+    print(&l);
     append(&l, dato1);
     print(&l);
+    insert(&l, 0, dato1);
+    print(&l);
+    insert(&l, 0, dato1);
+    print(&l);
+
     clear(&l);
 
-    printf("Nice");
+    printf("Nice\n");
     return 0;
 }

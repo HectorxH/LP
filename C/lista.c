@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "lista.h"
 
 typedef struct list list;
@@ -14,34 +15,16 @@ void init(list* l){
 }
 
 void clear(list* l){
-    if(l->length == 0){
-        free((void*)l->head);
-        return free((void*)l);
-    }
     node* prev = l->head;
     l->actual = prev->next;
-    while(l->actual != l->tail){
-        if(prev->info.tipo == 'l') clear((list*)prev->info.contenido);
-        else free((void*)prev->info.contenido);
-        free((void*)prev);
+    int i = 0;
+    while(l->actual != NULL){
+        printf("%d\n", i++);
+        free(prev);
         prev = l->actual;
         l->actual = l->actual->next;
     }
-    free((void*)l->actual);
-    return free((void*)l);
-}
-
-void insert(list* l, int i, dato d){
-    if(i >= l->length || i < 0) return;  //Invalid insert
-    l->actual = l->head;
-    for(int pos = 0; pos < i; i++)
-        l->actual = l->actual->next;
-    node* temp = l->actual->next;
-    l->actual->next = (node*)malloc(sizeof(node));
-    l->actual->next->info.contenido = d.contenido;
-    l->actual->next->info.tipo = d.tipo;
-    l->actual->next->next = temp;
-    l->length++;
+    free(prev);
     return;
 }
 
@@ -55,23 +38,34 @@ void append(list* l, dato d){
     return;
 }
 
-void remove(list* l, int i){
+void insert(list* l, int i, dato d){
+    if(i > l->length || i < 0) return;  //Invalid insert
+    if(i == l->length) return append(l, d);
+    l->actual = l->head;
+    for(int pos = 0; pos < i; pos++)
+        l->actual = l->actual->next;
+    node* temp = l->actual->next;
+    l->actual->next = (node*)malloc(sizeof(node));
+    l->actual->next->info.contenido = d.contenido;
+    l->actual->next->info.tipo = d.tipo;
+    l->actual->next->next = temp;
+    l->length++;
+    return;
+}
+
+void remov(list* l, int i){
     if(i >= l->length || l->length == 0 || i < 0) return;  //Invalid removes
     l->actual = l->head;
-    for(int pos = 0; pos < i; i++)
+    for(int pos = 0; pos < i; pos++)
         l->actual = l->actual->next;
     if(i == l->length-1){ //Remove at tail
         l->tail = l->actual;
-        if(l->actual->next->info.tipo == 'l') clear((list*)l->actual->next->info.contenido);
-        else free(l->actual->next->info.contenido);
-        free((void*)l->actual->next);
+        free(l->actual->next);
         l->length--;
         return;
     }
     node* temp = l->actual->next->next;
-    if(l->actual->next->info.tipo == 'l') clear((list*)l->actual->next->info.contenido);
-    else free(l->actual->next->info.contenido);
-    free((void*)l->actual->next);
+    free(l->actual->next);
     l->actual->next = temp;
     l->length--;
     return;
@@ -84,7 +78,7 @@ int length(list* l){
 dato* at(list* l, int i){
     if(i >= l->length || i < 0) return &(l->head->info);  //Invalid insert
     l->actual = l->head;
-    for(int pos = 0; pos < i; i++)
+    for(int pos = 0; pos < i; pos++)
         l->actual = l->actual->next;
-    return &(l->actual->next->info);
+    return &l->actual->next->info;
 }
