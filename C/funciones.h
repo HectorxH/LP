@@ -11,6 +11,6 @@ float sum(list* l);
 
 void print(list* l);
 
-float averge(list* l);
+float average(list* l);
 
 #endif
