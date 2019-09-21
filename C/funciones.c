@@ -37,27 +37,19 @@ float sum(list* a){
     return total;
 }
 
-void print_aux(list* a){
-    int i;
-    int len = length(a);
-    printf("[");
-    for(i=0; i<len; i++){
-        dato* d = at(a, i);
-        char tipo_d = d->tipo;
-        if(tipo_d == 'l')
-            print((list*)d->contenido);
-        else if(tipo_d == 'i')
-            printf("%d", *(int*)d->contenido);
-        else if(tipo_d == 'f')
-            printf("%f", *(float*)d->contenido);
-        if (i != len-1)
-            printf(", ");
-    }
-    printf("]");
-    return;
-}
+/*
+print_aux
+Función que muestra en pantalla la lista y sus contenidos de forma recursiva.
+No termina con salto de linea.
+——————————————–
+Inputs:
+(list*) Lista que se mostrará en pantalla.
+——————————————–
+Output:
+(void) No retorna.
+*/
 
-void print(list* a){
+void print_aux(list* a){
     int i;
     int len = length(a);
     printf("[");
@@ -73,7 +65,13 @@ void print(list* a){
         if (i != len-1)
             printf(", ");
     }
-    printf("]\n");
+    printf("]");
+    return;
+}
+
+void print(list* a){
+    print_aux(a);
+    printf("\n");
     return;
 }
 
