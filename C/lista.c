@@ -6,6 +6,11 @@ typedef struct list list;
 typedef struct node node;
 typedef struct dato dato;
 
+void free_node(node* n){
+    //if(n->info.tipo == 'l') clear((list*)n->info.contenido);
+    free((void*)n);
+}
+
 void init(list* l){
     l->head = l->tail = l->actual = (node*)malloc(sizeof(node));
     l->tail->next = NULL;
@@ -17,14 +22,12 @@ void init(list* l){
 void clear(list* l){
     node* prev = l->head;
     l->actual = prev->next;
-    int i = 0;
     while(l->actual != NULL){
-        printf("%d\n", i++);
-        free(prev);
+        free_node(prev);
         prev = l->actual;
         l->actual = l->actual->next;
     }
-    free(prev);
+    free_node(prev);
     return;
 }
 
@@ -60,12 +63,12 @@ void remov(list* l, int i){
         l->actual = l->actual->next;
     if(i == l->length-1){ //Remove at tail
         l->tail = l->actual;
-        free(l->actual->next);
+        free_node(l->actual->next);
         l->length--;
         return;
     }
     node* temp = l->actual->next->next;
-    free(l->actual->next);
+    free_node(l->actual->next);
     l->actual->next = temp;
     l->length--;
     return;

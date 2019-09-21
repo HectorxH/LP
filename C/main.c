@@ -36,7 +36,6 @@ int main(){
     insert(&l, 0, dato1);
     print(&l);
     insert(&l, 0, dato3);
-    append(&l, dato3);
     print(&l);
 
     float suma = sum(&l);
@@ -46,5 +45,6 @@ int main(){
     printf("%f\n", prom);
 
     clear(&l);
+    clear(&ld3);
     return 0;
 }
