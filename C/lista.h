@@ -30,7 +30,7 @@ void insert(list* a, int i, dato d);
 
 void append(list* a, dato d);
 
-void remv(list* a, int i);
+void remov(list* a, int i);
 
 int length(list* a);
 
