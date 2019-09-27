@@ -90,5 +90,9 @@ float average(list* a){
         else if(tipo_d == 'f')
             suma += *(float*)d->contenido;
     }
-    return suma/len;
+    if (n == 0){
+      printf("Error.\n");
+      return 0;
+    }
+    return suma/n;
 }
