@@ -28,10 +28,13 @@ void clear(list* l){
         l->actual = l->actual->next;
     }
     free_node(prev);
+    l->head = l->tail = l->actual = NULL;
+    l->length = 0;
     return;
 }
 
 void append(list* l, dato d){
+    if(l->head == NULL) init(l);
     l->tail->next = (node*)malloc(sizeof(node));
     l->tail = l->tail->next;
     l->tail->info.contenido = d.contenido;
@@ -42,6 +45,7 @@ void append(list* l, dato d){
 }
 
 void insert(list* l, int i, dato d){
+    if(l->head == NULL) init(l);
     if(i > l->length || i < 0) return;  //Invalid insert
     if(i == l->length) return append(l, d);
     l->actual = l->head;

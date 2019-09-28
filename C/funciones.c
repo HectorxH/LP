@@ -1,6 +1,7 @@
 #include "funciones.h"
 #include "lista.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct list list;
 typedef struct node node;
@@ -9,13 +10,15 @@ typedef struct dato dato;
 list* map(list* a, dato (*f)(dato)){
     int i;
     int len = length(a);
+    list* l = (list*)malloc(sizeof(list));
     for (i=0; i<len; i++){
-        dato* d = at(a, i);
-        char tipo_d = d->tipo;
+        dato d = *at(a, i);
+        char tipo_d = d.tipo;
         if(tipo_d == 'l')
-            d->contenido = map((list*)d->contenido, f);
+            d.contenido = map((list*)d.contenido, f);
         else if(tipo_d == 'i' || tipo_d == 'f')
-            *d = f(*d);
+            d = f(d);
+        append(l, d);
     }
     return a;
 }

@@ -1,4 +1,4 @@
-TARGET = main.c
+TARGET = main.out #Nombre del ejecutable producido
 
 CFLAGS = -Wall -Wextra -Wpointer-arith -g
 CC = gcc
@@ -6,19 +6,18 @@ CC = gcc
 SRCS := $(wildcard *.c)
 HEADERS := $(wildcard *.h)
 OBJECTS := $(SRCS:%.c=%.o)
-BINS := $(TARGET:%.c=%.out)
 
-all: $(BINS)
+all: $(TARGET)
 
 .PHONY: all clean
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-#.PRECIOUS: $(BINS) $(TARGET) $(OBJECTS)
+#.PRECIOUS: $(TARGET) $(OBJECTS)
 
 %.out: $(OBJECTS) $(HEADERS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -rf *.o $(BINS)
+	rm -rf *.o $(TARGET)
