@@ -13,13 +13,13 @@ int main(){
 
     dato dato2;
     int b = 2;
-    dato1.tipo = 'i';
-    dato1.contenido = &b;
+    dato2.tipo = 'i';
+    dato2.contenido = &b;
 
     dato dato3;
     float c = 3.0;
-    dato2.tipo = 'f';
-    dato2.contenido = &c;
+    dato3.tipo = 'f';
+    dato3.contenido = &c;
 
     /*dato dato4;
     dato4.tipo = 'l';
@@ -29,8 +29,13 @@ int main(){
 
     list l;
     init(&l);
+    print(&l);
     append(&l, dato2);
-    insert(&l, 0, dato1);
+    print(&l);
+    append(&l, dato1);
+    print(&l);
+    insert(&l, 0, dato3);
+    print(&l);
     append(&l, dato3);
     print(&l);
 

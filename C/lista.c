@@ -22,7 +22,7 @@ void free_node(node* n){
     free((void*)n);
 }
 
-dato copy(dato d){
+dato copy_dato(dato d){
     void* contenido = d.contenido;
     char tipo = d.tipo;
     void* ptr;
@@ -72,7 +72,7 @@ void append(list* l, dato d){
     if(l->head == NULL) init(l);
     l->tail->next = (node*)malloc(sizeof(node));
     l->tail = l->tail->next;
-    l->tail->info = copy(d);
+    l->tail->info = copy_dato(d);
     l->tail->next = NULL;
     l->length++;
     return;
@@ -80,13 +80,14 @@ void append(list* l, dato d){
 
 void insert(list* l, int i, dato d){
     if(l->head == NULL) init(l);
-    if(i > l->length || i < 0) return;  //Invalid insert
+    if(i > l->length || i < 0) {printf("Indice invalido\n");return;}  //Invalid insert
     if(i == l->length) return append(l, d);
     l->actual = l->head;
     for(int pos = 0; pos < i; pos++)
         l->actual = l->actual->next;
     node* temp = l->actual->next;
-    l->actual->next->info = copy(d);
+    l->actual->next = (node*)malloc(sizeof(node));
+    l->actual->next->info = copy_dato(d);
     l->actual->next->next = temp;
     l->length++;
     return;
