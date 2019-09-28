@@ -7,7 +7,7 @@ typedef struct node node;
 typedef struct dato dato;
 
 void free_node(node* n){
-    //if(n->info.tipo == 'l') clear((list*)n->info.contenido);
+    if(n->info.tipo == 'l') clear((list*)n->info.contenido);
     free((void*)n);
 }
 
