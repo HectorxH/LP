@@ -22,6 +22,30 @@ void free_node(node* n){
     free((void*)n);
 }
 
+dato copy(dato d){
+    void* contenido = d.contenido;
+    char tipo = d.tipo;
+    void* ptr;
+    if(tipo == 'i'){
+        ptr = malloc(sizeof(int));
+        *(int*)ptr = *(int*)contenido;
+    }
+    else if(tipo == 'f'){
+        ptr = malloc(sizeof(float));
+        *(float*)ptr = *(float*)contenido;
+    }
+    else if(tipo == 'l'){
+        list* l = (list*)contenido;
+        ptr = malloc(sizeof(list));
+        init((list*)ptr);
+        for(int i = 0; i < l->length; i++){
+            append((list*)ptr, *at(l, i));
+        }
+    }
+
+    return (dato) {.contenido = ptr, .tipo = tipo};
+}
+
 void init(list* l){
     l->head = l->tail = l->actual = (node*)malloc(sizeof(node));
     l->tail->next = NULL;
@@ -48,8 +72,7 @@ void append(list* l, dato d){
     if(l->head == NULL) init(l);
     l->tail->next = (node*)malloc(sizeof(node));
     l->tail = l->tail->next;
-    l->tail->info.contenido = d.contenido;
-    l->tail->info.tipo = d.tipo;
+    l->tail->info = copy(d);
     l->tail->next = NULL;
     l->length++;
     return;
@@ -63,9 +86,7 @@ void insert(list* l, int i, dato d){
     for(int pos = 0; pos < i; pos++)
         l->actual = l->actual->next;
     node* temp = l->actual->next;
-    l->actual->next = (node*)malloc(sizeof(node));
-    l->actual->next->info.contenido = d.contenido;
-    l->actual->next->info.tipo = d.tipo;
+    l->actual->next->info = copy(d);
     l->actual->next->next = temp;
     l->length++;
     return;
