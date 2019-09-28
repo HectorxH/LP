@@ -7,38 +7,39 @@ typedef struct list list;
 
 int main(){
     dato dato1;
-    int a = 20;
+    int a = 1;
     dato1.tipo = 'i';
     dato1.contenido = &a;
 
     dato dato2;
-    float b = 30.5;
-    dato2.tipo = 'f';
-    dato2.contenido = &b;
+    int b = 2;
+    dato1.tipo = 'i';
+    dato1.contenido = &b;
 
     dato dato3;
-    dato3.tipo = 'l';
-    list ld3;
-    init(&ld3);
-    dato3.contenido = &ld3;
+    float c = 3.0;
+    dato2.tipo = 'f';
+    dato2.contenido = &c;
+
+    /*dato dato4;
+    dato4.tipo = 'l';
+    list ld4;
+    init(&ld4);
+    dato3.contenido = &ld4;*/
 
     list l;
     init(&l);
-    append(&l, dato3);
-    print(&l);
-
-    clear(&l);
-    print(&l);
-
-    append(&l, dato3);
     append(&l, dato2);
-    append(&l, dato1);
+    insert(&l, 0, dato1);
+    append(&l, dato3);
     print(&l);
 
+    float suma = sum(&l);
+    printf("Suma = %f\n", suma);
     float prom = average(&l);
-    printf("%f\n", prom);
+    printf("Promedio = %f\n", prom);
 
     clear(&l);
-    clear(&ld3);
+    //clear(&ld4);
     return 0;
 }

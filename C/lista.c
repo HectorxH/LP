@@ -8,7 +8,7 @@ typedef struct dato dato;
 
 /*
 free_node
-Función que libera la memoria de un nodo.
+Función que libera la memoria de un nodo y su contenido.
 ——————————————–
 Inputs:
 (node*) Nodo al que se le liberará la memoria.
