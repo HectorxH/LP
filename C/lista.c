@@ -6,6 +6,17 @@ typedef struct list list;
 typedef struct node node;
 typedef struct dato dato;
 
+/*
+free_node
+Función que libera la memoria de un nodo.
+——————————————–
+Inputs:
+(node*) Nodo al que se le liberará la memoria.
+——————————————–
+Output:
+(void) No retorna.
+*/
+
 void free_node(node* n){
     if(n->info.tipo == 'l') clear((list*)n->info.contenido);
     free((void*)n);
