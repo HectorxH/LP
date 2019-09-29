@@ -43,6 +43,9 @@ int main(){
     insert(&l, 1, dato1);
     append(&l, dato3);
     insert(&l, 2, dato2);
+    remov(&l, 1);
+    remov(&l, 1);
+    remov(&l, 2);
     print(&l);
 
     float suma = sum(&l);
