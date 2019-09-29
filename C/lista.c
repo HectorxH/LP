@@ -19,6 +19,7 @@ Output:
 
 void free_node(node* n){
     if(n->info.tipo == 'l') clear((list*)n->info.contenido);
+    free((void*)n->info.contenido);
     free((void*)n);
 }
 
