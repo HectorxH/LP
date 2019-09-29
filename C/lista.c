@@ -102,6 +102,7 @@ void remov(list* l, int i){
     if(i == l->length-1){ //Remove at tail
         l->tail = l->actual;
         free_node(l->actual->next);
+        l->tail->next = NULL;
         l->length--;
         return;
     }
