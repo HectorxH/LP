@@ -1,6 +1,6 @@
 TARGET = main.out #Nombre del ejecutable producido
 
-CFLAGS = -Wall -Wextra -Wpointer-arith -g
+CFLAGS = -Wall -Wextra -Wpointer-arith -g -std=c99
 CC = gcc
 
 SRCS := $(wildcard *.c)
