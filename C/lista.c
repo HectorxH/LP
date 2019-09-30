@@ -23,6 +23,16 @@ void free_node(node* n){
     free((void*)n);
 }
 
+/*
+copy_dato
+Función que copia el dato entregado y lo retorna.
+——————————————–
+Inputs:
+(dato) Dato que se quiere copiar.
+——————————————–
+Output:
+(dato) Retorna el dato entregado.
+*/
 dato copy_dato(dato d){
     void* contenido = d.contenido;
     char tipo = d.tipo;

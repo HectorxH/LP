@@ -36,17 +36,35 @@ int main(){
     append(&ld5, dato2);
     append(&ld5, dato3);
 
+    dato dato6;
+    dato6.tipo = 'l';
+    list ld6;
+    dato6.contenido = &ld6;
+    append(&ld6, dato3);
+    append(&ld6, dato1);
+    append(&ld6, dato2);
+
+    dato dato7;
+    dato7.tipo = 'l';
+    list ld7;
+    init(&ld7);
+    dato7.contenido = &ld7;
+    append(&ld7, dato5);
+    append(&ld7, dato6);
+
+
     list l;
     init(&l);
     insert(&l, 0, dato4);
-    append(&l, dato5);
-    insert(&l, 1, dato1);
-    append(&l, dato3);
-    insert(&l, 2, dato2);
-    remov(&l, 1);
+    append(&l, dato1);
+    append(&l, dato2);
+    insert(&l, 3, dato3);
+    append(&l, dato7);
+    print(&l);
+    /*remov(&l, 1);
     remov(&l, 1);
     remov(&l, 2);
-    print(&l);
+    print(&l);*/
 
     float suma = sum(&l);
     printf("Suma = %f\n", suma);
@@ -56,5 +74,7 @@ int main(){
     clear(&l);
     clear(&ld4);
     clear(&ld5);
+    clear(&ld6);
+    clear(&ld7);
     return 0;
 }
