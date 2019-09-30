@@ -3,8 +3,6 @@
 #include "lista.h"
 #include "funciones.h"
 
-typedef struct list list;
-
 dato funcioncita(dato datito){
     if(datito.tipo == 'i'){
         int* temp = (int*)malloc(sizeof(int));
@@ -91,8 +89,11 @@ int main(){
     float prom2 = average(&l);
     printf("Promedio = %f\n", prom2);
 
-    map(&l, funcioncita);
-    print(&l);
+    list* map_list = map(&l, funcioncita);
+    print(map_list);
+
+    clear(map_list);
+    free((void*)map_list);
 
     clear(&l);
     clear(&ld4);

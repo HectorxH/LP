@@ -11,6 +11,7 @@ list* map(list* a, dato (*f)(dato)){
     int i;
     int len = length(a);
     list* l = (list*)malloc(sizeof(list));
+    init(l);
     for (i=0; i<len; i++){
         dato d = *at(a, i);
         char tipo_d = getTipo(&d);
@@ -19,8 +20,10 @@ list* map(list* a, dato (*f)(dato)){
         else if(tipo_d == 'i' || tipo_d == 'f')
             d = f(d);
         append(l, d);
+        clear((list*)getContenido(&d));
+        free(getContenido(&d));
     }
-    return a;
+    return l;
 }
 
 float sum(list* a){
