@@ -5,6 +5,20 @@
 
 typedef struct list list;
 
+dato funcioncita(dato datito){
+    if(datito.tipo == 'i'){
+        int* temp = (int*)malloc(sizeof(int));
+        *temp = *(int*)datito.contenido + 69;
+        datito.contenido = temp;
+    }
+    else if(datito.tipo == 'f'){
+        float* temp = (float*)malloc(sizeof(float));
+        *temp = *(float*)datito.contenido + 69;
+        datito.contenido = temp;
+    }
+    return datito;
+}
+
 int main(){
     dato dato1;
     int a = 1;
@@ -76,6 +90,9 @@ int main(){
     printf("Suma = %f\n", suma2);
     float prom2 = average(&l);
     printf("Promedio = %f\n", prom2);
+
+    map(&l, funcioncita);
+    print(&l);
 
     clear(&l);
     clear(&ld4);
