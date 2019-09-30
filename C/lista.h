@@ -22,8 +22,6 @@ typedef struct list list;
 typedef struct node node;
 typedef struct dato dato;
 
-void initDato(dato* d, char t, void* c);
-
 char getTipo(dato* d);
 
 void setTipo(dato* d, char t);

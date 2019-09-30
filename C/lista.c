@@ -8,7 +8,7 @@ typedef struct dato dato;
 
 /*
 free_node
-Función que libera la memoria de un nodo y su contenido.
+Libera la memoria de un nodo y su contenido.
 ——————————————–
 Inputs:
 (node*) Nodo al que se le liberará la memoria.
@@ -25,7 +25,7 @@ void free_node(node* n){
 
 /*
 copy_dato
-Función que copia el dato entregado y lo retorna.
+Copia el dato entregado y lo retorna.
 ——————————————–
 Inputs:
 (dato) Dato que se quiere copiar.
@@ -57,23 +57,60 @@ dato copy_dato(dato d){
     return (dato) {.contenido = ptr, .tipo = tipo};
 }
 
-void initDato(dato* d, char t, void* c){
-    d->tipo = t;
-    d->contenido = c;
-}
-
+/*
+getTipo
+Obtiene el tipo del dato entregado.
+——————————————–
+Inputs:
+(dato*) Dato que se quiere obtener su tipo.
+——————————————–
+Output:
+(char) Retorna el tipo del dato entregado.
+*/
 char getTipo(dato* d){
     return d->tipo;
 }
 
+/*
+setTipo
+Recibe un dato y un tipo, y le asigna este tipo al dato.
+——————————————–
+Inputs:
+(dato*) Dato al que se le asignará el tipo.
+(char) Tipo que se asignará al dato.
+——————————————–
+Output:
+(void) No retorna.
+*/
 void setTipo(dato* d, char t){
     d->tipo = t;
 }
 
+/*
+getContenido
+Obtiene el contenido del dato entregado a la función.
+——————————————–
+Inputs:
+(dato*) Dato que se quiere obtener su contenido.
+——————————————–
+Output:
+(void*) Retorna un puntero al contenido del dato.
+*/
 void* getContenido(dato* d){
     return d->contenido;
 }
 
+/*
+setContenido
+Recibe un dato y un contenido, y le asigna este contenido al dato.
+——————————————–
+Inputs:
+(dato*) Dato al que se le asignará el contenido.
+(void*) Contenido que se asignará al dato.
+——————————————–
+Output:
+(void) No retorna.
+*/
 void setContenido(dato* d, void* c){
     d->contenido = c;
 }

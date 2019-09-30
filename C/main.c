@@ -39,6 +39,7 @@ int main(){
     dato dato6;
     dato6.tipo = 'l';
     list ld6;
+    init(&ld6);
     dato6.contenido = &ld6;
     append(&ld6, dato3);
     append(&ld6, dato1);
@@ -52,7 +53,6 @@ int main(){
     append(&ld7, dato5);
     append(&ld7, dato6);
 
-
     list l;
     init(&l);
     insert(&l, 0, dato4);
@@ -61,10 +61,10 @@ int main(){
     insert(&l, 3, dato3);
     append(&l, dato7);
     print(&l);
-    /*remov(&l, 1);
+    remov(&l, 1);
     remov(&l, 1);
     remov(&l, 2);
-    print(&l);*/
+    print(&l);
 
     float suma = sum(&l);
     printf("Suma = %f\n", suma);
