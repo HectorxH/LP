@@ -52,6 +52,7 @@ int main(){
     dato7.contenido = &ld7;
     append(&ld7, dato5);
     append(&ld7, dato6);
+    insert(&ld7, 0, dato6);
 
     list l;
     init(&l);
@@ -61,15 +62,20 @@ int main(){
     insert(&l, 3, dato3);
     append(&l, dato7);
     print(&l);
+
+    float suma1 = sum(&l);
+    printf("Suma = %f\n", suma1);
+    float prom1 = average(&l);
+    printf("Promedio = %f\n", prom1);
+
     remov(&l, 1);
     remov(&l, 1);
-    remov(&l, 2);
     print(&l);
 
-    float suma = sum(&l);
-    printf("Suma = %f\n", suma);
-    float prom = average(&l);
-    printf("Promedio = %f\n", prom);
+    float suma2 = sum(&l);
+    printf("Suma = %f\n", suma2);
+    float prom2 = average(&l);
+    printf("Promedio = %f\n", prom2);
 
     clear(&l);
     clear(&ld4);

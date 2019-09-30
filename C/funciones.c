@@ -94,7 +94,7 @@ float average(list* a){
             suma += *(float*)getContenido(d);
     }
     if (n == 0){
-      printf("Error.\n");
+      printf("Error: El promedio no está definido para esta lista.\n");
       return 0;
     }
     return suma/n;
