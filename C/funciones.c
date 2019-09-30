@@ -13,9 +13,9 @@ list* map(list* a, dato (*f)(dato)){
     list* l = (list*)malloc(sizeof(list));
     for (i=0; i<len; i++){
         dato d = *at(a, i);
-        char tipo_d = d.tipo;
+        char tipo_d = getTipo(&d);
         if(tipo_d == 'l')
-            d.contenido = map((list*)d.contenido, f);
+            setContenido(&d, map((list*)getContenido(&d), f));
         else if(tipo_d == 'i' || tipo_d == 'f')
             d = f(d);
         append(l, d);
@@ -29,13 +29,13 @@ float sum(list* a){
     int len = length(a);
     for (i=0; i<len; i++){
         dato* d = at(a, i);
-        char tipo_d = d->tipo;
+        char tipo_d = getTipo(d);
         if(tipo_d == 'l')
-            total += sum((list*)d->contenido);
+            total += sum((list*)getContenido(d));
             else if(tipo_d == 'i')
-            total += *(int*)d->contenido;
+            total += *(int*)getContenido(d);
         else if(tipo_d == 'f')
-            total += *(float*)d->contenido;
+            total += *(float*)getContenido(d);
     }
     return total;
 }
@@ -58,13 +58,13 @@ void print_aux(list* a){
     printf("[");
     for(i=0; i<len; i++){
         dato* d = at(a, i);
-        char tipo_d = d->tipo;
+        char tipo_d = getTipo(d);
         if(tipo_d == 'l')
-            print_aux((list*)d->contenido);
+            print_aux((list*)getContenido(d));
         else if(tipo_d == 'i')
-            printf("%d", *(int*)d->contenido);
+            printf("%d", *(int*)getContenido(d));
         else if(tipo_d == 'f')
-            printf("%f", *(float*)d->contenido);
+            printf("%f", *(float*)getContenido(d));
         if (i != len-1)
             printf(", ");
     }
@@ -84,14 +84,14 @@ float average(list* a){
     float suma = 0;
     for (i=0; i<len; i++){
         dato* d = at(a, i);
-        char tipo_d = d->tipo;
+        char tipo_d = getTipo(d);
         if(tipo_d == 'l')
-            if(length((list*)d->contenido) == 0) n--;
-            else suma += average((list*)d->contenido);
+            if(length((list*)getContenido(d)) == 0) n--;
+            else suma += average((list*)getContenido(d));
         else if(tipo_d == 'i')
-            suma += *(int*)d->contenido;
+            suma += *(int*)getContenido(d);
         else if(tipo_d == 'f')
-            suma += *(float*)d->contenido;
+            suma += *(float*)getContenido(d);
     }
     if (n == 0){
       printf("Error.\n");

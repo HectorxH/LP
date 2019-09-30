@@ -47,6 +47,28 @@ dato copy_dato(dato d){
     return (dato) {.contenido = ptr, .tipo = tipo};
 }
 
+void initDato(dato* d, char t, void* c){
+    d->tipo = t;
+    d->contenido = c;
+}
+
+char getTipo(dato* d){
+    return d->tipo;
+}
+
+void setTipo(dato* d, char t){
+    d->tipo = t;
+}
+
+void* getContenido(dato* d){
+    return d->contenido;
+}
+
+void setContenido(dato* d, void* c){
+    d->contenido = c;
+}
+
+
 void init(list* l){
     l->head = l->tail = l->actual = (node*)malloc(sizeof(node));
     l->tail->next = NULL;
