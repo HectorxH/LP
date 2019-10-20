@@ -1,32 +1,39 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import java.util.Arrays;
+
+import estructuras.Pais;
+import estructuras.Empresa;
+import estructuras.Ciudad;
 
 class Main {
     public static void main(String[] args) throws FileNotFoundException{
-        Pais p = mapa();
-        Empresa emp = empresa(p);
+        Empresa emp = empresa();
+        Pais p = mapa(emp);
         edificaciones(p);
 
         int ciudadOptima = p.ciudadOptima();
-        system.out.println("La ciudad "+ciudadOptima+" es la ubicación optima.");
+        String format = String.format("La ciudad %d es la ubicación optima.", ciudadOptima);
+        System.out.println(format);
 
-        for(int i=0; i < p.getnNodes(); i++){
-            System.out.println("ciudad "+i+":");
-            System.out.println("- Utilidad: "+p.getUtilidad(i));
+        int nNodes = p.getnNodes();
+        for(int i=0; i < nNodes; i++){
+            format = String.format("ciudad %d:", i);
+            System.out.println(format);
+            format = String.format("- Utilidad: %d", p.getUtilidad(i));
+            System.out.println(format);
             int[] nVehiculos;
             System.out.println("- Se utilizaron "); // NO SE CUANTOS CAMIONES Y CAMIONETAS AAAAAAAAAAAAAAAAAAA
         }
     }
 
-    public static Pais mapa() throws FileNotFoundException{
+    private static Pais mapa(Empresa emp) throws FileNotFoundException{
         File file = new File("mapa.txt");
         Scanner sc = new Scanner(file);
 
         int nCiudades = sc.nextInt();
         int nCaminos = sc.nextInt();
-        Pais p = new Pais(nCiudades, nCaminos);
+        Pais p = new Pais(nCiudades, nCaminos, emp);
 
         for(int i=0; i < nCaminos; i++){
             int origen = sc.nextInt();
@@ -39,18 +46,18 @@ class Main {
         return p;
     }
 
-    public static Empresa empresa() throws FileNotFoundException{
+    private static Empresa empresa() throws FileNotFoundException{
         File file = new File("empresa.txt");
         Scanner sc = new Scanner(file);
 
-        int balon_gas = sc.nextInt();
-        int litro_gas = sc.nextInt();
+        int balonGas = sc.nextInt();
+        int litroGas = sc.nextInt();
         int kilometros = sc.nextInt();
 
-        return new Empresa(balon_gas, litro_gas, kilometros);
+        return new Empresa(balonGas, litroGas, kilometros);
     }
 
-    public static void edificaciones(Pais p) throws FileNotFoundException{
+    private static void edificaciones(Pais p) throws FileNotFoundException{
         File file = new File("edificaciones.txt");
         Scanner sc = new Scanner(file);
 
@@ -61,17 +68,17 @@ class Main {
             int nCasas = sc.nextInt();
             int nEdificios = sc.nextInt();
 
-            Ciudad c = new Ciudad(id, nCasas, nEdificios);
+            Ciudad ciudad = new Ciudad(id, nCasas, nEdificios);
 
-            for(int i=0; i < nCasas; i++){
+            for(int j = 0; j < nCasas; j++){
                 int consumo = sc.nextInt();
-                c.newCasa(consumo);
+                ciudad.newCasa(consumo);
             }
-            for(int i=0; i < nEdificios; i++){
+            for(int j=0; j < nEdificios; j++){
                 int consumo = sc.nextInt();
-                c.newEdificio(consumo);
+                ciudad.newEdificio(consumo);
             }
-            p.addNode(id, c);
+            p.addNode(id, ciudad);
         }
     }
 }

@@ -3,8 +3,12 @@ package estructuras;
 abstract class Vehiculo {
     private int consumo;
 
+    Vehiculo(int consumo){
+        this.consumo = consumo;
+    }
+
     public int getConsumo() {
-        return consumo;
+        return this.consumo;
     }
 
     public void setConsumo(int consumo) {

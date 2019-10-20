@@ -1,4 +1,7 @@
 package estructuras;
 
-public class Casa extends Edificacion {
+class Casa extends Edificacion {
+    Casa(int consumo) {
+        super(consumo);
+    }
 }

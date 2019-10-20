@@ -1,4 +1,7 @@
 package estructuras;
 
-public class CamionCisterna extends Vehiculo {
+class CamionCisterna extends Vehiculo {
+    CamionCisterna(int consumo) {
+        super(consumo);
+    }
 }
