@@ -1,10 +1,7 @@
 package estructuras;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 public class Pais implements Grafo {
     private int nNodes;
@@ -13,23 +10,27 @@ public class Pais implements Grafo {
     private Empresa Empresa;
     private Ciudad[] Ciudades;
 
-    private float[][] adjMatrix;
-    private float[][] dist;
+    private boolean apsp = false;
+
+    private int[][] adjMatrix;
+    private int[][] dist;
     private int[][] path;
+    private int[][] cost;
 
     public Pais(int nNodes, int nEdges, Empresa empresa) {
         this.nNodes = nNodes;
         this.nEdges = nEdges;
         this.Ciudades = new Ciudad[nNodes];
-        this.adjMatrix = new float[nNodes][nNodes];
-        this.dist = new float[nNodes][nNodes];
+        this.adjMatrix = new int[nNodes][nNodes];
+        this.dist = new int[nNodes][nNodes];
         this.path = new int[nNodes][nNodes];
+        this.cost = new int[nNodes][nNodes];
         for(int i = 0; i < nNodes; i++){
             for(int j = 0; j < nNodes; j++){
                 this.adjMatrix[i][j] = Grafo.INF;
                 this.path[i][j] = -1;
                 if(i == j) {
-                    this.adjMatrix[i][j] = 0.0f;
+                    this.adjMatrix[i][j] = 0;
                     this.path[i][j] = 0;
                 }
             }
@@ -38,11 +39,17 @@ public class Pais implements Grafo {
     }
 
     @Override
-    public float edgeWeight(int v, int u) {
+    public int edgeWeight(int v, int u) {
         return this.adjMatrix[v][u];
     }
 
     private void floyd(){
+        for(int i = 0; i < this.nNodes; i++){
+            for(int j = 0; j < this.nNodes; j++){
+                this.dist[i][j] = this.adjMatrix[i][j];
+                if(this.dist[i][j] < Grafo.INF) this.path[i][j] = i;
+            }
+        }
         for(int k = 0; k < this.nNodes; k++) {
             for (int i = 0; i < this.nNodes; i++) {
                 for (int j = 0; j < this.nNodes; j++) {
@@ -53,20 +60,18 @@ public class Pais implements Grafo {
                 }
             }
         }
-    }
-
-    public void allPairsShortestPath(){
-        for(int i = 0; i < this.nNodes; i++){
-            for(int j = 0; j < this.nNodes; j++){
-                this.dist[i][j] = this.adjMatrix[i][j];
-                if(this.dist[i][j] < Grafo.INF) this.path[i][j] = i;
+        for(int j = 0; j < this.nNodes; j++){
+            Ciudad dest = this.Ciudades[j];
+            for(int i = 0; i < this.nNodes; i++){
+                this.cost[i][j] = this.dist[i][j] * (dest.getnCasas() + dest.getnEdificios());
             }
         }
-        this.floyd();
+        this.apsp = true;
     }
 
     @Override
     public List<Integer> shortestPath(int v, int u) {
+        if(!this.apsp) this.floyd();
         List<Integer> p;
         if(this.path[v][u] == v) p = new LinkedList<>();
         else p = this.shortestPath(v, this.path[v][u]);
@@ -75,14 +80,14 @@ public class Pais implements Grafo {
     }
 
     @Override
-    public void addEdge(int v, int u, float w) {
+    public void addEdge(int v, int u, int w) {
         this.adjMatrix[v][u] = w;
         this.adjMatrix[u][v] = w;
     }
 
     @Override
-    public void addNode(int v) {
-
+    public void addNode(int v, Ciudad ciudad) {
+        this.Ciudades[v] = ciudad;
     }
 
     public int getnNodes() {
@@ -91,5 +96,13 @@ public class Pais implements Grafo {
 
     public int getnEdges() {
         return this.nEdges;
+    }
+
+    public Empresa getEmpresa() {
+        return Empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        Empresa = empresa;
     }
 }
