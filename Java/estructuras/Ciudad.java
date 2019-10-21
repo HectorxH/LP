@@ -11,7 +11,7 @@ public class Ciudad {
     private List<Edificacion> Casas;
     private List<Edificacion> Edificios;
 
-    public Ciudad(int id, int nEdificios, int nCasas){
+    public Ciudad(int id, int nCasas, int nEdificios){
         this.id = id;
         this.nEdificios = nEdificios;
         this.nCasas = nCasas;

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Pais implements Grafo {
-    private int maxId = -1;
+    private int minId = -1;
 
     private int nNodes;
     private int nEdges;
@@ -45,6 +45,7 @@ public class Pais implements Grafo {
     }
 
     public int edgeWeight(int v, int u) {
+        System.out.println("Added edge");
         return this.adjMatrix[v][u];
     }
 
@@ -117,27 +118,27 @@ public class Pais implements Grafo {
         this.Empresa = empresa;
     }
 
-    private void calcMax(){
-        int maxVal = 0;
+    private void calcMin(){
+        int minVal = Grafo.INF;
         for(int i = 0; i < this.nNodes; i++){
             int currVal = 0;
             for(int j = 0; j < this.nNodes; j++){
                 currVal += this.cost[i][j];
             }
-            if(currVal > maxVal){
-                this.maxId = i;
-                maxVal = currVal;
+            if(currVal < minVal){
+                this.minId = i;
+                minVal = currVal;
             }
         }
     }
 
     public int ciudadOptima() {
-        if(this.maxId == -1) this.calcMax();
-        return this.maxId;
+        if(this.minId == -1) this.calcMin();
+        return this.minId;
     }
 
     public int getUtilidad(int id) {
-        if(this.maxId == -1) this.calcMax();
+        if(this.minId == -1) this.calcMin();
         Ciudad ciudad = this.Ciudades[id];
 
         int precioBalon = this.Empresa.getPrecioBalon();
@@ -146,6 +147,17 @@ public class Pais implements Grafo {
         int consumoCasas = ciudad.consumoCasas();
         int consumoEdificios = ciudad.consumoEdificios();
 
-        return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[this.maxId][id];
+        return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[this.minId][id];
+    }
+
+    public int getnCamiones(int i){
+        Ciudad ciudad = Ciudades[i];
+        return ciudad.getnEdificios();
+    }
+
+    public int getnCamionetas(int i){
+        Ciudad ciudad = Ciudades[i];
+        return (ciudad.getnCasas() > 0)? 1 : 0;
+
     }
 }

@@ -22,8 +22,10 @@ class Main {
             System.out.println(format);
             format = String.format("- Utilidad: %d", p.getUtilidad(i));
             System.out.println(format);
-            int[] nVehiculos;
-            System.out.println("- Se utilizaron "); // NO SE CUANTOS CAMIONES Y CAMIONETAS AAAAAAAAAAAAAAAAAAA
+            int nCamiones = p.getnCamiones(i);
+            int nCamionetas = p.getnCamionetas(i);
+            format = String.format("- Se utilizaron %d camiones cisterna y %d camionetas", nCamiones, nCamionetas);
+            System.out.println(format); // NO SE CUANTOS CAMIONES Y CAMIONETAS AAAAAAAAAAAAAAAAAAA
         }
     }
 
@@ -35,14 +37,14 @@ class Main {
         int nCaminos = sc.nextInt();
         Pais p = new Pais(nCiudades, nCaminos, emp);
 
-        for(int i=0; i < nCaminos; i++){
+        for(int i = 0; i < nCaminos; i++){
             int origen = sc.nextInt();
             int destino = sc.nextInt();
             int peso = sc.nextInt();
 
             p.addEdge(origen, destino, peso);
         }
-
+        sc.close();
         return p;
     }
 
@@ -80,5 +82,6 @@ class Main {
             }
             p.addNode(id, ciudad);
         }
+        sc.close();
     }
 }
