@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 import estructuras.Pais;
@@ -12,20 +13,37 @@ class Main {
         Pais p = mapa(emp);
         edificaciones(p);
 
-        int ciudadOptima = p.ciudadOptima();
-        String format = String.format("La ciudad %d es la ubicación optima.", ciudadOptima);
+        String format;
+
+        List<Integer> ciudadesOptimas = p.ciudadesOptimas();
+        int nOptimas = ciudadesOptimas.size();
+        if(nOptimas == 1)
+            format = String.format("La ciudad %d es la ubicación optima.\n", ciudadesOptimas.get(0));
+        else
+            format = String.format("Las ciudades %s son la ubicación optima.\n", ciudadesOptimas.toString());
         System.out.println(format);
 
         int nNodes = p.getnNodes();
-        for(int i=0; i < nNodes; i++){
-            format = String.format("ciudad %d:", i);
+        for(int dest = 0; dest < nNodes; dest++){
+            format = String.format("ciudad %d:", dest);
             System.out.println(format);
-            format = String.format("- Utilidad: %d", p.getUtilidad(i));
-            System.out.println(format);
-            int nCamiones = p.getnCamiones(i);
-            int nCamionetas = p.getnCamionetas(i);
+
+            for (int src : ciudadesOptimas) {
+                int util = p.getUtilidad(src, dest);
+
+                if(nOptimas == 1)
+                    format = String.format("- Utilidad: %d", util);
+                else
+                    format = String.format("- Utilidad desde %d: %d", src, util);
+                System.out.println(format);
+            }
+
+            int nCamiones = p.getnCamiones(dest);
+            int nCamionetas = p.getnCamionetas(dest);
+
             format = String.format("- Se utilizaron %d camiones cisterna y %d camionetas", nCamiones, nCamionetas);
-            System.out.println(format); // NO SE CUANTOS CAMIONES Y CAMIONETAS AAAAAAAAAAAAAAAAAAA
+            System.out.println(format);
+            System.out.println();
         }
     }
 

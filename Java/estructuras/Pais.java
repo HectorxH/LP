@@ -1,10 +1,11 @@
 package estructuras;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Pais implements Grafo {
-    private int minId = -1;
+    private List<Integer> minId;
 
     private int nNodes;
     private int nEdges;
@@ -26,6 +27,7 @@ public class Pais implements Grafo {
         this.floydBool = false;
 
         this.Ciudades = new Ciudad[nNodes];
+        this.minId = new LinkedList<>();
 
         this.adjMatrix = new int[nNodes][nNodes];
         this.dist = new int[nNodes][nNodes];
@@ -36,11 +38,9 @@ public class Pais implements Grafo {
             for (int j = 0; j < nNodes; j++) {
                 this.adjMatrix[i][j] = Grafo.INF;
                 this.path[i][j] = -1;
-                if (i == j) {
-                    this.adjMatrix[i][j] = 0;
-                    this.path[i][j] = 0;
-                }
             }
+            this.adjMatrix[i][i] = 0;
+            this.path[i][i] = 0;
         }
     }
 
@@ -119,6 +119,8 @@ public class Pais implements Grafo {
     }
 
     private void calcMin(){
+        if(!this.floydBool) this.floyd();
+
         int minVal = Grafo.INF;
         for(int i = 0; i < this.nNodes; i++){
             int currVal = 0;
@@ -126,20 +128,20 @@ public class Pais implements Grafo {
                 currVal += this.cost[i][j];
             }
             if(currVal < minVal){
-                this.minId = i;
+                this.minId = new LinkedList<>();
                 minVal = currVal;
             }
+            if(currVal <= minVal) this.minId.add(i);
         }
     }
 
-    public int ciudadOptima() {
-        if(this.minId == -1) this.calcMin();
+    public List<Integer> ciudadesOptimas() {
+        if(this.minId.isEmpty()) this.calcMin();
         return this.minId;
     }
 
-    public int getUtilidad(int id) {
-        if(this.minId == -1) this.calcMin();
-        Ciudad ciudad = this.Ciudades[id];
+    public int getUtilidad(int src, int dest) {
+        Ciudad ciudad = this.Ciudades[dest];
 
         int precioBalon = this.Empresa.getPrecioBalon();
         int precioLitro = this.Empresa.getPrecioLitro();
@@ -147,16 +149,16 @@ public class Pais implements Grafo {
         int consumoCasas = ciudad.consumoCasas();
         int consumoEdificios = ciudad.consumoEdificios();
 
-        return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[this.minId][id];
+        return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[src][dest];
     }
 
     public int getnCamiones(int i){
-        Ciudad ciudad = Ciudades[i];
+        Ciudad ciudad = this.Ciudades[i];
         return ciudad.getnEdificios();
     }
 
     public int getnCamionetas(int i){
-        Ciudad ciudad = Ciudades[i];
+        Ciudad ciudad = this.Ciudades[i];
         return (ciudad.getnCasas() > 0)? 1 : 0;
 
     }
