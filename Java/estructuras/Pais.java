@@ -59,12 +59,11 @@ public class Pais implements Grafo {
     }
 
     private void setCosts(){
+        int consumo = this.Empresa.getConsumo();
         for(int j = 0; j < this.nNodes; j++){
             Ciudad dest = this.Ciudades[j];
-            for(int i = 0; i < this.nNodes; i++){
-                int hayCasas = (dest.getnCasas() > 0)? 1 : 0;
-                this.cost[i][j] = 2 * this.dist[i][j] * (hayCasas + dest.getnEdificios());
-            }
+            for(int i = 0; i < this.nNodes; i++)
+                this.cost[i][j] = 2 * this.dist[i][j] * (getnCamiones(j) + getnCamionetas(j)) * consumo;
         }
     }
 

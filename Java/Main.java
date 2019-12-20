@@ -74,6 +74,8 @@ class Main {
         int litroGas = sc.nextInt();
         int kilometros = sc.nextInt();
 
+        sc.close();
+
         return new Empresa(balonGas, litroGas, kilometros);
     }
 
