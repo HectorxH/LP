@@ -47,6 +47,12 @@ class Main {
         }
     }
 
+    /** mapa
+    Empresa emp
+    --------------------
+    Recibe una empresa y extrae del archivo de texto mapa.txt las ciudades y caminos. Crea un pais con
+    estos datos.
+    */
     private static Pais mapa(Empresa emp) throws FileNotFoundException{
         File file = new File("mapa.txt");
         Scanner sc = new Scanner(file);
@@ -66,6 +72,11 @@ class Main {
         return p;
     }
 
+    /** empresa
+    --------------------
+    Extrae del archivo de texto empresa.txt el precio de balon de gas, litro de gas y costo por kilometro
+    de transporte y retorna una Empresa.
+    */
     private static Empresa empresa() throws FileNotFoundException{
         File file = new File("empresa.txt");
         Scanner sc = new Scanner(file);
@@ -79,6 +90,11 @@ class Main {
         return new Empresa(balonGas, litroGas, kilometros);
     }
 
+    /** edificaciones
+    Pais p
+    --------------------
+    Extrae del archivo de texto edificaciones.txt 
+    */
     private static void edificaciones(Pais p) throws FileNotFoundException{
         File file = new File("edificaciones.txt");
         Scanner sc = new Scanner(file);
