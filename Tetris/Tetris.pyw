@@ -1,4 +1,5 @@
 from random import  shuffle
+from math import floor
 import pygame, sys
 
 CELL_SIZE = 36
@@ -19,13 +20,12 @@ linelines = [0, 1, 3, 5, 8]
 
 class TetrisGame:
     def __init__(self):
+        pygame.mixer.pre_init(44100, -16, 1, 512)
         pygame.init()
         self.dimensions = (CELL_SIZE*(COLS+2*SIDE), CELL_SIZE*ROWS)
         self.side = CELL_SIZE*(COLS+SIDE)
 
-        self.default_font =  pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE*0.7))
-        self.small_font = pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE*0.5))
-        self.big_font = pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE))
+        self.make_fonts()
 
         icon_surf = pygame.image.load("Tetris.png")
         pygame.display.set_icon(icon_surf)
@@ -33,11 +33,32 @@ class TetrisGame:
         self.window = pygame.display.set_mode(self.dimensions, pygame.RESIZABLE)
         self.window.fill(DETAIL)
         pygame.display.set_caption("Tetris!")
+
         pygame.mixer.music.load("Tetris.ogg")
+
+        self.sounds = {}
+        self.sounds["lock"] = pygame.mixer.Sound("sfx/lock.wav")
+        self.sounds["hard drop"] = pygame.mixer.Sound("sfx/hard_drop.wav")
+        self.sounds["swap"] = pygame.mixer.Sound("sfx/swap.wav")
+        self.sounds["move"] = pygame.mixer.Sound("sfx/move.wav")
+        self.sounds["rotate"] = pygame.mixer.Sound("sfx/rotate.wav")
+        self.sounds["single"] = pygame.mixer.Sound("sfx/single.wav")
+        self.sounds["double"] = pygame.mixer.Sound("sfx/double.wav")
+        self.sounds["triple"] = pygame.mixer.Sound("sfx/triple.wav")
+        self.sounds["tetris"] = pygame.mixer.Sound("sfx/tetris.wav")
+        self.sounds["b2b tetris"] = pygame.mixer.Sound("sfx/b2b_tetris.wav")
 
         self.init_game()
 
-    #Genera una nueva instancia de cada pieza y las desordena
+
+    def make_fonts(self):
+        font = pygame.font.get_default_font()
+        create_font = lambda size: pygame.font.Font(font, floor(CELL_SIZE*size))
+
+        self.small_font = create_font(0.5)
+        self.default_font =  create_font(0.7)
+        self.big_font = create_font(1)
+
     def new_bag(self):
         shapes = [O, L, J, T, I, Z, S]
         list = [shapes[i]() for i in range(7)]
@@ -46,8 +67,8 @@ class TetrisGame:
 
     def new_tetromino(self):
         if len(self.bag) == 7:
-            self.bag = self.new_bag() + self.bag
-        self.tetromino = self.bag.pop()
+            self.bag = self.bag+self.new_bag()
+        self.tetromino = self.bag.pop(0)
 
         self.gameover = self.board.new_tetromino(self.tetromino)
 
@@ -74,26 +95,22 @@ class TetrisGame:
         self.b2b_tetris = False
         self.b2b_tspin = False
 
-        self.level = 1
-        self.score = 0
-        self.lines = 0
-        self.combo = 0
-
-        self.count = 0
+        self.stats = {}
+        self.stats["Level"] = 1
+        self.stats["Score"] = 0
+        self.stats["Lines"] = 0
+        self.stats["Combo"] = 0
 
         pygame.mixer.music.rewind()
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(VOLUME)
 
     def draw_next(self):
+        offset = floor(CELL_SIZE/2)
         self.display_text("Next:", (self.side+CELL_SIZE, 0))
-        self.bag[-1].draw(self.screen, (self.side+int(CELL_SIZE/2),CELL_SIZE), 0.9)
-        self.bag[-2].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*0.5), 0.4)
-        self.bag[-3].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*2), 0.4)
-        self.bag[-4].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*3.5), 0.4)
-        self.bag[-5].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*5), 0.4)
-        self.bag[-6].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*6.5), 0.4)
-        self.bag[-7].draw(self.screen, (self.side+CELL_SIZE*4,CELL_SIZE*8), 0.4)
+        self.bag[0].draw(self.screen, (self.side+offset,CELL_SIZE), 0.9)
+        for i, tetromino in enumerate(self.bag[1:7]):
+            tetromino.draw(self.screen, (self.side+8*offset, 4*i*offset), 0.4)
 
     def draw_hold(self):
         x,y = 1,1
@@ -103,10 +120,9 @@ class TetrisGame:
 
     def draw_stats(self):
         x,y = 0.1,5
-        self.display_smoll_text("Level: {}".format(self.level), (1+self.side+CELL_SIZE*x, CELL_SIZE*y))
-        self.display_smoll_text("Lines: {}".format(self.lines), (1+self.side+CELL_SIZE*x, CELL_SIZE*(y+1)))
-        self.display_smoll_text("Score: {}".format(self.score), (1+self.side+CELL_SIZE*x, CELL_SIZE*(y+2)))
-        self.display_smoll_text("Combo: {}".format(self.combo), (1+self.side+CELL_SIZE*x, CELL_SIZE*(y+3)))
+        print_stat = lambda offset, k: self.display_smoll_text("{}: {}".format(k, self.stats[k]), (1+self.side+CELL_SIZE*x, CELL_SIZE*(y+offset)))
+        for i, k in enumerate(self.stats):
+            print_stat(i,k)
 
     def draw_splash_text(self):
         for i, info in enumerate(self.text):
@@ -149,49 +165,62 @@ class TetrisGame:
 
     def score_lines(self, lines, isTspin):
         if lines == 0:
-            self.combo = 0
+            self.stats["Combo"] = 0
         else:
-            self.combo+=1
+            self.stats["Combo"]+=1
 
         if isTspin:
-            self.score += score[lines+3]*self.level
+            self.stats["Score"] += score[lines+3]*self.stats["Level"]
             self.tspin(lines)
         else:
-            self.score += score[lines]*self.level
+            self.stats["Score"] += score[lines]*self.stats["Level"]
             if lines == 4:
                 self.tetris()
 
         if lines>=4 and self.b2b_tetris:
-            self.score += int(score[lines]*self.level*0.5)
+            self.stats["Score"] += floor(score[lines]*self.stats["Level"]*0.5)
             self.b2b()
         if isTspin and self.b2b_tspin:
-            self.score += int(score[lines+3]*self.level*0.5)
+            self.stats["Score"] += floor(score[lines+3]*self.stats["Level"]*0.5)
             self.b2b()
 
-        self.score += 50*self.combo*self.level
-        if self.combo >= 5:
-            self.combo_count(self.combo)
+        self.stats["Score"] += 50*self.stats["Combo"]*self.stats["Level"]
+        if self.stats["Combo"] >= 5:
+            self.combo_count(self.stats["Combo"])
 
-        self.lines += linelines[lines]
-        if self.lines >= self.level*5:
-            self.level += 1
-            self.delay = max(1, BASE_DALAY-2*self.level)
+        self.stats["Lines"] += linelines[lines]
+        if self.stats["Lines"] >= self.stats["Level"]*5:
+            self.stats["Level"] += 1
+            self.delay = max(1, BASE_DALAY-2*self.stats["Level"])
 
-        self.b2b_tetris = lines>=4
-        self.b2b_tspin_double = lines==2 and isTspin
-        self.b2b_tspin_triple = isTspin
+        if lines > 0:
+            self.b2b_tetris = lines>=4
+            self.b2b_tspin = isTspin
 
     def move(self, dir):
         if not self.gameover and not self.paused:
-            self.board.move(dir)
+            if self.board.move(dir):
+                pygame.mixer.Sound.play(self.sounds["move"])
 
-
+    def resize(self, w, h):
+        global CELL_SIZE
+        w, h = w-w%COLS, h-h%ROWS
+        w, h = max(w, h), min(w, h)
+        self.dimensions = (w, h)
+        self.window = pygame.display.set_mode(self.dimensions, pygame.RESIZABLE)
+        CELL_SIZE = floor(h/22)
+        self.side = CELL_SIZE*(COLS+SIDE)
+        self.screen = pygame.surface.Surface((h, h))
+        self.default_font =  pygame.font.Font(pygame.font.get_default_font(), floor(CELL_SIZE*0.7))
+        self.small_font = pygame.font.Font(pygame.font.get_default_font(), floor(CELL_SIZE*0.5))
+        self.big_font = pygame.font.Font(pygame.font.get_default_font(), floor(CELL_SIZE))
 
     def quit(self):
         sys.exit()
 
     def swap_hold(self):
         if not self.gameover and not self.paused and not self.did_swap:
+            pygame.mixer.Sound.play(self.sounds["swap"])
             if not self.holding:
                 self.hold = self.tetromino
                 self.new_tetromino()
@@ -201,42 +230,41 @@ class TetrisGame:
             self.hold, self.tetromino = self.tetromino, self.hold
             self.hold.reset()
             self.did_swap = True
-            self.count = 0
 
-    def drop(self):
+    def update_piece(self, lines, isTspin):
+        if lines == 4:
+            if self.b2b_tetris:
+                pygame.mixer.Sound.play(self.sounds["b2b tetris"])
+            else:
+                pygame.mixer.Sound.play(self.sounds["tetris"])
+        else:
+            type = ["lock", "single", "double", "triple"]
+            pygame.mixer.Sound.play(self.sounds[type[lines]])
+        self.score_lines(lines, isTspin)
+        self.new_tetromino()
+        self.did_swap = False
+
+    def drop(self, soft=False):
         if not self.gameover and not self.paused:
-            lines, isTspin = self.board.drop(self.delay)
+            if soft and self.tetromino.score < 20:
+                self.stats["Score"] += 1
+                self.tetromino.score += 1
+            lines, isTspin = self.board.drop(self.delay, soft)
             if lines >= 0:
-                self.score_lines(lines, isTspin)
-                self.new_tetromino()
-                self.count = 0
-                self.did_swap = False
-
-    def soft_drop(self):
-        if not self.gameover and not self.paused:
-            if self.count < 20:
-                self.score += 1
-            lines, isTspin = self.board.drop(self.delay, manual=True)
-            if lines >= 0:
-                self.score_lines(lines, isTspin)
-                self.new_tetromino()
-                self.count = 0
-                self.did_swap = False
-
+                self.update_piece(lines, isTspin)
 
     def hard_drop(self):
         if not self.gameover and not self.paused:
-            self.score += 40
+            pygame.mixer.Sound.play(self.sounds["hard drop"])
+            self.stats["Score"] += 40
             lines, isTspin = self.board.drop(self.delay, manual=True)
             while lines < 0:
                 lines, isTspin = self.board.drop(self.delay, manual=True, hard=True)
-            self.score_lines(lines, isTspin)
-            self.new_tetromino()
-            self.count = 0
-            self.did_swap = False
+            self.update_piece(lines, isTspin)
 
     def rotate(self, dir):
         if not self.gameover and not self.paused:
+            pygame.mixer.Sound.play(self.sounds["rotate"])
             self.board.rotate(dir)
 
     def pause(self):
@@ -246,9 +274,10 @@ class TetrisGame:
         self.init_game()
 
     def loop(self):
-        global CELL_SIZE
         clock = pygame.time.Clock()
-        tick = 0
+        moveTick = 0
+        moveAccel = 0
+        dropTick = 0
 
         while True:
             self.window.fill(DETAIL)
@@ -265,7 +294,7 @@ class TetrisGame:
                 self.draw_hold()
                 self.draw_stats()
                 self.draw_splash_text()
-            self.window.blit(self.screen, (int(self.dimensions[0]/2 - CELL_SIZE*11), 0))
+            self.window.blit(self.screen, (floor(self.dimensions[0]/2 - CELL_SIZE*11), 0))
             pygame.display.update()
 
             for event in pygame.event.get():
@@ -273,42 +302,42 @@ class TetrisGame:
                     self.quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE: self.paused = not self.paused
-                    elif event.key == pygame.K_LEFT: self.isMovingLeft = True
-                    elif event.key == pygame.K_RIGHT: self.isMovingRight = True
-                    elif event.key == pygame.K_DOWN: self.isSoftDroping = True
                     elif event.key in (pygame.K_UP, pygame.K_x): self.rotate(1)
                     elif event.key in (pygame.K_LSHIFT, pygame.K_c): self.swap_hold()
                     elif event.key in (pygame.K_LCTRL, pygame.K_z):  self.rotate(-1)
                     elif event.key == pygame.K_SPACE: self.hard_drop()
                     elif event.key == pygame.K_q: self.quit()
                     elif event.key == pygame.K_r: self.restart()
+                    elif event.key == pygame.K_LEFT:
+                        self.isMovingLeft = True
+                        moveTick = 0
+                        moveAccel = 7
+                    elif event.key == pygame.K_RIGHT:
+                        self.isMovingRight = True
+                        moveTick = 0
+                        moveAccel = 7
+                    elif event.key == pygame.K_DOWN:
+                        self.isSoftDroping = True
+                        dropTick = 0
+
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT: self.isMovingLeft = False
                     elif event.key == pygame.K_RIGHT: self.isMovingRight = False
                     elif event.key == pygame.K_DOWN: self.isSoftDroping = False
                 elif event.type == pygame.VIDEORESIZE:
-                    w, h = event.w, min(22*int(event.h/22), event.w)
-                    self.dimensions = (w, h)
-                    self.window = pygame.display.set_mode(self.dimensions, pygame.RESIZABLE)
-                    CELL_SIZE = int(h/22)
-                    self.side = CELL_SIZE*(COLS+SIDE)
-                    self.screen = pygame.surface.Surface((h, h))
-                    self.default_font =  pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE*0.7))
-                    self.small_font = pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE*0.5))
-                    self.big_font = pygame.font.Font(pygame.font.get_default_font(), int(CELL_SIZE))
-
-
+                    self.resize(event.w, event.h)
 
             self.drop()
-            if tick == 0:
+            if moveTick == 0:
                 if self.isMovingLeft:
                     self.move(-1)
                 elif self.isMovingRight:
                     self.move(1)
-                elif self.isSoftDroping:
-                    self.soft_drop()
-
-            tick = (tick+1)%int(5*MAX_FPS/60)
+                moveAccel = max(moveAccel-1, 4)
+            if dropTick == 0 and self.isSoftDroping:
+                self.drop(soft=True)
+            moveTick = (moveTick+1)%floor(moveAccel*MAX_FPS/60)
+            dropTick = (dropTick+1)%floor(5*MAX_FPS/60)
 
             clock.tick(MAX_FPS)
 
@@ -339,12 +368,14 @@ class Board:
     def move(self, dir):
         if self.active_tetromino == False:
             return
+        didMove = False
         x, y = self.tetromino.get_pos()
         x += dir
         if not self.willCollide((x,y)):
             self.tetromino.set_pos((x,y))
-        # self.tetromino.wall_kick = False
+            didMove = True
         self.tetromino.last_rotate = False
+        return didMove
 
     def draw_ghost(self, screen):
         x, y = self.tetromino.get_pos()
@@ -354,11 +385,10 @@ class Board:
         self.tetromino.draw(screen, ((x+SIDE-3)*CELL_SIZE, (y-5)*CELL_SIZE), ghost=True)
 
     def drop(self, delay, manual=False, hard=False):
-        Tetromino.DELAY = BASE_DALAY-int((BASE_DALAY-delay)/2)
+        Tetromino.DELAY = BASE_DALAY-floor((BASE_DALAY-delay)/2)
         isTspin = False
         self.clock += 1
         self.tetromino.lock_delay -= 1
-        print(self.tetromino.lock_delay)
         if self.clock % delay == 0 or manual:
             if not self.active_tetromino:
                 return -2, isTspin
@@ -436,6 +466,7 @@ class Tetromino():
     def __init__(self):
         self.state = 0
         self.lock_delay = Tetromino.DELAY
+        self.score = 0
 
     def get_color(self):
         return self.color
@@ -469,7 +500,7 @@ class Tetromino():
     def draw(self, screen, pos=(-1,-1), scale=1, ghost=False):
         x, y = ((SIDE+self.pos[0]-3)*CELL_SIZE,(self.pos[1]-5)*CELL_SIZE) if pos==(-1,-1) else pos
         shape = self.shape[1:] if scale != 1 and isinstance(self, I) else self.shape
-        color = tuple(map(lambda x: int(x*0.5), self.color)) + tuple([127]) if ghost else self.color
+        color = tuple(map(lambda x: floor(x/3), self.color)) if ghost else self.color
         for off_y, row in enumerate(shape):
             for off_x, block in enumerate(row):
                 if scale != 1 and isinstance(self, I):
@@ -489,7 +520,7 @@ class O(Tetromino):
         super().__init__()
         self.width = 2
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[0, 1, 1],
     	              [0, 1, 1],
                       [0, 0, 0]]
@@ -500,7 +531,7 @@ class L(Tetromino):
         super().__init__()
         self.width = 3
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[0, 0, 1],
     	              [1, 1, 1],
                       [0, 0, 0]]
@@ -510,7 +541,7 @@ class J(Tetromino):
         super().__init__()
         self.width = 3
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[1, 0, 0],
     	              [1, 1, 1],
                       [0, 0, 0]]
@@ -520,7 +551,7 @@ class T(Tetromino):
         super().__init__()
         self.width = 3
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[0, 1, 0],
     	              [1, 1, 1],
                       [0, 0, 0]]
@@ -539,7 +570,7 @@ class I(Tetromino):
         super().__init__()
         self.width = 4
         self.hight = 1
-        self.pos = (int(COLS/2) -3 + 3, 3)
+        self.pos = (floor(COLS/2) -3 + 3, 3)
         self.shape = [[0, 0, 0, 0, 0],
                       [0, 0, 0, 0, 0],
                       [0, 1, 1, 1, 1],
@@ -553,7 +584,7 @@ class Z(Tetromino):
         super().__init__()
         self.width = 3
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[1, 1, 0],
     	              [0, 1, 1],
                       [0, 0, 0]]
@@ -563,7 +594,7 @@ class S(Tetromino):
         super().__init__()
         self.width = 3
         self.hight = 2
-        self.pos = (int(COLS/2) - 2 + 3, 5)
+        self.pos = (floor(COLS/2) - 2 + 3, 5)
         self.shape = [[0, 1, 1],
     	              [1, 1, 0],
                       [0, 0, 0]]
