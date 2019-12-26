@@ -409,6 +409,7 @@ class Board:
                         count+=1
             return count > 2 and not self.tetromino.wall_kick and self.tetromino.last_rotate
         return False
+        
 
     def drop(self, delay, manual=False, hard=False):
         Tetromino.DELAY = BASE_DALAY-floor((BASE_DALAY-delay)/2)
