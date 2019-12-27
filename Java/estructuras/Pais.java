@@ -60,11 +60,23 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (edgeWeight)
+    (int) (v)
+    (int) (u)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public int edgeWeight(int v, int u) {
         System.out.println("Added edge");
         return this.adjMatrix[v][u];
     }
 
+    /** (init)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     private void init(){
         for(int i = 0; i < this.nNodes; i++){
             for(int j = 0; j < this.nNodes; j++){
@@ -74,6 +86,11 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (setCosts)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     private void setCosts(){
         int consumo = this.Empresa.getConsumo();
         for(int j = 0; j < this.nNodes; j++){
@@ -83,6 +100,11 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (floyd)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     private void floyd(){
         this.init();
         for(int k = 0; k < this.nNodes; k++) {
@@ -99,6 +121,13 @@ public class Pais implements Grafo {
         this.floydBool = true;
     }
 
+    /** (shortestPath)
+    (int) (v)
+    (int) (u)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public List<Integer> shortestPath(int v, int u) {
         if(!this.floydBool) this.floyd();
         List<Integer> p;
@@ -108,31 +137,72 @@ public class Pais implements Grafo {
         return p;
     }
 
+    /** (addEdge)
+    (int) (v)
+    (int) (u)
+    (int) (w)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public void addEdge(int v, int u, int w) {
         this.adjMatrix[v][u] = w;
         this.adjMatrix[u][v] = w;
     }
 
+    /** (addNode)
+    (int) (v)
+    (Ciudad) (ciudad)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public void addNode(int v, Ciudad ciudad) {
         this.Ciudades[v] = ciudad;
     }
 
+    /** (getnNodes)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public int getnNodes() {
         return this.nNodes;
     }
 
+    /** (getnEdges)
+    --------------------
+    Descipci´on breve
+    --------------------
+    */
     public int getnEdges() {
         return this.nEdges;
     }
 
+    /** (getEmpresa)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public Empresa getEmpresa() {
         return this.Empresa;
     }
 
+    /** (setEmpresa)
+    (Empresa) (empresa)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public void setEmpresa(Empresa empresa) {
         this.Empresa = empresa;
     }
 
+    /** (calcMin)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     private void calcMin(){
         if(!this.floydBool) this.floyd();
 
@@ -150,11 +220,23 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (ciudadesOptimas)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public List<Integer> ciudadesOptimas() {
         if(this.minId.isEmpty()) this.calcMin();
         return this.minId;
     }
 
+    /** (getUtilidad)
+    (int) (src)
+    (int) (dest)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public int getUtilidad(int src, int dest) {
         Ciudad ciudad = this.Ciudades[dest];
 
@@ -167,11 +249,23 @@ public class Pais implements Grafo {
         return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[src][dest];
     }
 
+    /** (getnCamiones)
+    (int) (i)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public int getnCamiones(int i){
         Ciudad ciudad = this.Ciudades[i];
         return ciudad.getnEdificios();
     }
 
+    /** (getnCamionetas)
+    (int) (i)
+    --------------------
+    Descripci´on breve
+    --------------------
+    */
     public int getnCamionetas(int i){
         Ciudad ciudad = this.Ciudades[i];
         return (ciudad.getnCasas() > 0)? 1 : 0;

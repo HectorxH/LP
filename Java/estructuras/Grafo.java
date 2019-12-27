@@ -3,8 +3,9 @@ package estructuras;
 import java.util.List;
 
 public interface Grafo {
-    int INF = 1000000007;
 
+	//(int) (INF) : Raz´on de existir.
+    int INF = 1000000007;
 
     int edgeWeight(int v, int u);
     List<Integer> shortestPath(int v, int u);
