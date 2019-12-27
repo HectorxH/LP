@@ -5,19 +5,35 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Pais implements Grafo {
+
+    //(List<Integer>) (minId) : 
     private List<Integer> minId;
 
+    //(int) (nNodes) : Guarda el valor de la cantidad de nodos del pais.
     private int nNodes;
+
+    //(int) (nEdges) : Guarda el valor de la cantidad de aristas del pais.
     private int nEdges;
 
+    //(Empresa) (Empresa) : Guarda una Empresa.
     private Empresa Empresa;
+
+    //(Ciudad) (Ciudades) : Guarda Ciudades en un arreglo.
     private Ciudad[] Ciudades;
 
+    //(boolean) (floydBool) : Es True si la distancia calculada es minima para el pais actual y False en caso contrario.
     private boolean floydBool;
 
+    //(int) (adjMatrix) : Guarda una matriz.
     private int[][] adjMatrix;
+
+    //(int) (dist) : 
     private int[][] dist;
+
+    //(int) (path) : 
     private int[][] path;
+
+    //(int) (cost) : 
     private int[][] cost;
 
     public Pais(int nNodes, int nEdges, Empresa empresa) {
