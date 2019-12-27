@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Grafo {
 
-	//(int) (INF) : Raz´on de existir.
+	//(int) (INF) : Un numero muy grande.
     int INF = 1000000007;
 
     int edgeWeight(int v, int u);

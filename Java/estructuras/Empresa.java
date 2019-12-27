@@ -5,20 +5,19 @@ import java.util.List;
 
 public class Empresa{
 
-    //(int) (PrecioBalon) : Raz´on de existir.
+    //(int) (PrecioBalon) : Guarda el valor del precio del Balon de gas.
     private int PrecioBalon;
 
-    //(int) (PrecioLitro) : Raz´on de existir.
+    //(int) (PrecioLitro) : Guarda el valor del precio del Litro de gas.
     private int PrecioLitro;
 
-    //(List<Vehiculo>) (Vehiculos) : Raz´on de existir.
+    //(List<Vehiculo>) (Vehiculos) : Guarda los Vehiculos de la Empresa en una lista.
     private List<Vehiculo> Vehiculos;
 
     public Empresa(int precioBalon, int precioLitro, int kilometros) {
         this.PrecioBalon = precioBalon;
         this.PrecioLitro = precioLitro;
 
-        //No estoy seguro para que usar los vehiculos
         this.Vehiculos = new LinkedList<>();
         Vehiculo camionCisterna = new CamionCisterna(kilometros);
         this.Vehiculos.add(camionCisterna);
@@ -28,7 +27,7 @@ public class Empresa{
 
     /** (getPrecioBalon)
     --------------------
-    Descripci´on breve
+    Obtiene el precio del Balon de gas.
     --------------------
     */
     public int getPrecioBalon() {
@@ -38,7 +37,7 @@ public class Empresa{
     /** (setPrecioBalon)
     (int) (precioBalon)
     --------------------
-    Descripci´on breve
+    Establece el precio del Balon de gas.
     --------------------
     */
     public void setPrecioBalon(int precioBalon) {
@@ -47,7 +46,7 @@ public class Empresa{
 
     /** (getPrecioLitro)
     --------------------
-    Descripci´on breve
+    Obtiene el precio del Litro de gas.
     --------------------
     */
     public int getPrecioLitro() {
@@ -57,7 +56,7 @@ public class Empresa{
     /** (setPrecioLitro)
     (int) (precioLitro)
     --------------------
-    Descripci´on breve
+    Establece el precio del Litro de gas.
     --------------------
     */
     public void setPrecioLitro(int precioLitro) {
@@ -66,7 +65,7 @@ public class Empresa{
 
     /** (getConsumo)
     --------------------
-    Descripci´on breve
+    Obtiene el consumo de los Vehiculos de la Empresa.
     --------------------
     */
     public int getConsumo(){

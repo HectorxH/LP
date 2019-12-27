@@ -6,13 +6,13 @@ import java.util.List;
 
 public class Pais implements Grafo {
 
-    //(List<Integer>) (minId) : 
+    //(List<Integer>) (minId) : Guarda los nodos optimos en una lista.
     private List<Integer> minId;
 
-    //(int) (nNodes) : Guarda el valor de la cantidad de nodos del pais.
+    //(int) (nNodes) : Guarda el numero de nodos del pais.
     private int nNodes;
 
-    //(int) (nEdges) : Guarda el valor de la cantidad de aristas del pais.
+    //(int) (nEdges) : Guarda el numero de aristas del pais.
     private int nEdges;
 
     //(Empresa) (Empresa) : Guarda una Empresa.
@@ -24,16 +24,16 @@ public class Pais implements Grafo {
     //(boolean) (floydBool) : Es True si la distancia calculada es minima para el pais actual y False en caso contrario.
     private boolean floydBool;
 
-    //(int) (adjMatrix) : Guarda una matriz.
+    //(int) (adjMatrix) : Guarda la matriz de adjacencia del grafo.
     private int[][] adjMatrix;
 
-    //(int) (dist) : 
+    //(int) (dist) : Guarda la distancia entre par de nodos.
     private int[][] dist;
 
-    //(int) (path) : 
+    //(int) (path) : Guarda la informacion necesaria para reconstruir el camino mas corto.
     private int[][] path;
 
-    //(int) (cost) : 
+    //(int) (cost) : Guarda el costo entre par de nodos.
     private int[][] cost;
 
     public Pais(int nNodes, int nEdges, Empresa empresa) {
@@ -64,7 +64,7 @@ public class Pais implements Grafo {
     (int) (v)
     (int) (u)
     --------------------
-    Descripci´on breve
+    Establece el peso de una arista.
     --------------------
     */
     public int edgeWeight(int v, int u) {
@@ -74,7 +74,7 @@ public class Pais implements Grafo {
 
     /** (init)
     --------------------
-    Descripci´on breve
+    Crea un grafo.
     --------------------
     */
     private void init(){
@@ -88,7 +88,7 @@ public class Pais implements Grafo {
 
     /** (setCosts)
     --------------------
-    Descripci´on breve
+    Establece los costos de una Empresa.
     --------------------
     */
     private void setCosts(){
@@ -102,7 +102,7 @@ public class Pais implements Grafo {
 
     /** (floyd)
     --------------------
-    Descripci´on breve
+    Calcula la distancia minima entre todos los pares de nodos.
     --------------------
     */
     private void floyd(){
@@ -125,7 +125,7 @@ public class Pais implements Grafo {
     (int) (v)
     (int) (u)
     --------------------
-    Descripci´on breve
+    Retorna el camino mas corto desde el nodo v hasta el nodo u.
     --------------------
     */
     public List<Integer> shortestPath(int v, int u) {
@@ -142,7 +142,7 @@ public class Pais implements Grafo {
     (int) (u)
     (int) (w)
     --------------------
-    Descripci´on breve
+    Agrega una arista de v a u con el peso w.
     --------------------
     */
     public void addEdge(int v, int u, int w) {
@@ -154,7 +154,7 @@ public class Pais implements Grafo {
     (int) (v)
     (Ciudad) (ciudad)
     --------------------
-    Descripci´on breve
+    Agrega un nodo v a la ciudad.
     --------------------
     */
     public void addNode(int v, Ciudad ciudad) {
@@ -163,7 +163,7 @@ public class Pais implements Grafo {
 
     /** (getnNodes)
     --------------------
-    Descripci´on breve
+    Obtiene el numero de nodos del Pais.
     --------------------
     */
     public int getnNodes() {
@@ -172,7 +172,7 @@ public class Pais implements Grafo {
 
     /** (getnEdges)
     --------------------
-    Descipci´on breve
+    Obitene el numero de aristas del Pais.
     --------------------
     */
     public int getnEdges() {
@@ -181,7 +181,7 @@ public class Pais implements Grafo {
 
     /** (getEmpresa)
     --------------------
-    Descripci´on breve
+    Obtiene una Empresa.
     --------------------
     */
     public Empresa getEmpresa() {
@@ -191,7 +191,7 @@ public class Pais implements Grafo {
     /** (setEmpresa)
     (Empresa) (empresa)
     --------------------
-    Descripci´on breve
+    Establece una Empresa.
     --------------------
     */
     public void setEmpresa(Empresa empresa) {
@@ -200,7 +200,7 @@ public class Pais implements Grafo {
 
     /** (calcMin)
     --------------------
-    Descripci´on breve
+    Calcula las ciudades optimas.
     --------------------
     */
     private void calcMin(){
@@ -222,7 +222,7 @@ public class Pais implements Grafo {
 
     /** (ciudadesOptimas)
     --------------------
-    Descripci´on breve
+    Retorna una lista con las ciudades optimas.
     --------------------
     */
     public List<Integer> ciudadesOptimas() {
@@ -234,7 +234,7 @@ public class Pais implements Grafo {
     (int) (src)
     (int) (dest)
     --------------------
-    Descripci´on breve
+    Obtiene la utilidad desde un nodo de origen src hasta el nodo destino dest.
     --------------------
     */
     public int getUtilidad(int src, int dest) {
@@ -252,7 +252,7 @@ public class Pais implements Grafo {
     /** (getnCamiones)
     (int) (i)
     --------------------
-    Descripci´on breve
+    Obtiene el numero de camiones.
     --------------------
     */
     public int getnCamiones(int i){
@@ -263,7 +263,7 @@ public class Pais implements Grafo {
     /** (getnCamionetas)
     (int) (i)
     --------------------
-    Descripci´on breve
+    Obtiene el numero de camionetas.
     --------------------
     */
     public int getnCamionetas(int i){

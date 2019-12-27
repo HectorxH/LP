@@ -5,19 +5,19 @@ import java.util.List;
 
 public class Ciudad {
 
-    //(int) (id) : Raz´on de existir.
+    //(int) (id) : Guarda el identificador de la Ciudad.
     private int id;
 
-    //(int) (nEdificios) : Raz´on de existir.
+    //(int) (nEdificios) : Guarda el numero de Edificios de la Ciudad.
     private int nEdificios;
 
-    //(int) (nCasas) : Raz´on de existir.
+    //(int) (nCasas) : Guarda el numero de Casas de la Ciudad.
     private int nCasas;
 
-    //(List<Edificacion>) (Casas) : Raz´on de existir.
+    //(List<Edificacion>) (Casas) : Guarda las Casas de una Ciudad en una lista.
     private List<Edificacion> Casas;
 
-    //(List<Edificacion>) (Edificios) : Raz´on de existir.
+    //(List<Edificacion>) (Edificios) : Guarda los Edificios de una Ciudad en una lista.
     private List<Edificacion> Edificios;
 
     public Ciudad(int id, int nCasas, int nEdificios){
@@ -30,7 +30,7 @@ public class Ciudad {
 
     /** (getId)
     --------------------
-    Descripci´on breve
+    Obtiene el identificador de la Ciudad.
     --------------------
     */
     public int getId() {
@@ -40,7 +40,7 @@ public class Ciudad {
     /** (setId)
     (int) (id)
     --------------------
-    Descripci´on breve
+    Establece el identificador de la Ciudad.
     --------------------
     */
     public void setId(int id) {
@@ -49,7 +49,7 @@ public class Ciudad {
 
     /** (getnEdificios)
     --------------------
-    Descripci´on breve
+    Obtiene el numero de edificios de la Ciudad.
     --------------------
     */
     public int getnEdificios() {
@@ -59,7 +59,7 @@ public class Ciudad {
     /** (setnEdificios)
     (int) (nEdificios)
     --------------------
-    Descripci´on breve
+    Establece el numero de edificios de la Ciudad.
     --------------------
     */
     public void setnEdificios(int nEdificios) {
@@ -68,7 +68,7 @@ public class Ciudad {
 
     /** (getnCasas)
     --------------------
-    Descripci´on breve
+    Obtiene el numero de casas de la Ciudad.
     --------------------
     */
     public int getnCasas() {
@@ -78,7 +78,7 @@ public class Ciudad {
     /** (setnCasas)
     (int) (nCasas)
     --------------------
-    Descripci´on breve
+    Establece el numero de casas de la Ciudad.
     --------------------
     */
     public void setnCasas(int nCasas) {
@@ -88,7 +88,7 @@ public class Ciudad {
     /** (newCasa)
     (int) (consumo)
     --------------------
-    Descripci´on breve
+    Crea una Casa con su respectivo consumo.
     --------------------
     */
     public void newCasa(int consumo) {
@@ -99,7 +99,7 @@ public class Ciudad {
     /** (newEdificio)
     (int) (consumo)
     --------------------
-    Descripci´on breve
+    Crea un Edificio con su respectivo consumo.
     --------------------
     */
     public void newEdificio(int consumo) {
@@ -109,7 +109,7 @@ public class Ciudad {
 
     /** (consumoCasas)
     --------------------
-    Descripci´on breve
+    Obtiene el consumo total de las Casas de la Ciudad.
     --------------------
     */
     int consumoCasas() {
@@ -123,7 +123,7 @@ public class Ciudad {
 
     /** (consumoEdificios)
     --------------------
-    Descripci´on breve
+    Obtiene el consumo total de los Edificios de la Ciudad.
     --------------------
     */
     int consumoEdificios() {

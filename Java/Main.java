@@ -93,7 +93,7 @@ class Main {
     /** (edificaciones)
     (Pais) (p)
     --------------------
-    Extrae del archivo de texto edificaciones.txt 
+    Extrae del archivo de texto edificaciones.txt las edificaciones de cada ciudad junto con su consumo y crea sus respectuvas ciudades.
     */
     private static void edificaciones(Pais p) throws FileNotFoundException{
         File file = new File("edificaciones.txt");
