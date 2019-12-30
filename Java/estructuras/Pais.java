@@ -6,13 +6,13 @@ import java.util.List;
 
 public class Pais implements Grafo {
 
-    //(List<Integer>) (minId) : 
+    //(List<Integer>) (minId) : Guarda los nodos optimos en una lista.
     private List<Integer> minId;
 
-    //(int) (nNodes) : Guarda el valor de la cantidad de nodos del pais.
+    //(int) (nNodes) : Guarda el numero de nodos del pais.
     private int nNodes;
 
-    //(int) (nEdges) : Guarda el valor de la cantidad de aristas del pais.
+    //(int) (nEdges) : Guarda el numero de aristas del pais.
     private int nEdges;
 
     //(Empresa) (Empresa) : Guarda una Empresa.
@@ -24,16 +24,16 @@ public class Pais implements Grafo {
     //(boolean) (floydBool) : Es True si la distancia calculada es minima para el pais actual y False en caso contrario.
     private boolean floydBool;
 
-    //(int) (adjMatrix) : Guarda una matriz.
+    //(int) (adjMatrix) : Guarda la matriz de adjacencia del grafo.
     private int[][] adjMatrix;
 
-    //(int) (dist) : 
+    //(int) (dist) : Guarda la distancia entre par de nodos.
     private int[][] dist;
 
-    //(int) (path) : 
+    //(int) (path) : Guarda la informacion necesaria para reconstruir el camino mas corto.
     private int[][] path;
 
-    //(int) (cost) : 
+    //(int) (cost) : Guarda el costo entre par de nodos.
     private int[][] cost;
 
     public Pais(int nNodes, int nEdges, Empresa empresa) {
@@ -60,11 +60,23 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (edgeWeight)
+    (int) (v)
+    (int) (u)
+    --------------------
+    Establece el peso de una arista.
+    --------------------
+    */
     public int edgeWeight(int v, int u) {
         System.out.println("Added edge");
         return this.adjMatrix[v][u];
     }
 
+    /** (init)
+    --------------------
+    Crea un grafo.
+    --------------------
+    */
     private void init(){
         for(int i = 0; i < this.nNodes; i++){
             for(int j = 0; j < this.nNodes; j++){
@@ -74,6 +86,11 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (setCosts)
+    --------------------
+    Establece los costos de una Empresa.
+    --------------------
+    */
     private void setCosts(){
         int consumo = this.Empresa.getConsumo();
         for(int j = 0; j < this.nNodes; j++){
@@ -83,6 +100,11 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (floyd)
+    --------------------
+    Calcula la distancia minima entre todos los pares de nodos.
+    --------------------
+    */
     private void floyd(){
         this.init();
         for(int k = 0; k < this.nNodes; k++) {
@@ -99,6 +121,13 @@ public class Pais implements Grafo {
         this.floydBool = true;
     }
 
+    /** (shortestPath)
+    (int) (v)
+    (int) (u)
+    --------------------
+    Retorna el camino mas corto desde el nodo v hasta el nodo u.
+    --------------------
+    */
     public List<Integer> shortestPath(int v, int u) {
         if(!this.floydBool) this.floyd();
         List<Integer> p;
@@ -108,31 +137,72 @@ public class Pais implements Grafo {
         return p;
     }
 
+    /** (addEdge)
+    (int) (v)
+    (int) (u)
+    (int) (w)
+    --------------------
+    Agrega una arista de v a u con el peso w.
+    --------------------
+    */
     public void addEdge(int v, int u, int w) {
         this.adjMatrix[v][u] = w;
         this.adjMatrix[u][v] = w;
     }
 
+    /** (addNode)
+    (int) (v)
+    (Ciudad) (ciudad)
+    --------------------
+    Agrega un nodo v a la ciudad.
+    --------------------
+    */
     public void addNode(int v, Ciudad ciudad) {
         this.Ciudades[v] = ciudad;
     }
 
+    /** (getnNodes)
+    --------------------
+    Obtiene el numero de nodos del Pais.
+    --------------------
+    */
     public int getnNodes() {
         return this.nNodes;
     }
 
+    /** (getnEdges)
+    --------------------
+    Obitene el numero de aristas del Pais.
+    --------------------
+    */
     public int getnEdges() {
         return this.nEdges;
     }
 
+    /** (getEmpresa)
+    --------------------
+    Obtiene una Empresa.
+    --------------------
+    */
     public Empresa getEmpresa() {
         return this.Empresa;
     }
 
+    /** (setEmpresa)
+    (Empresa) (empresa)
+    --------------------
+    Establece una Empresa.
+    --------------------
+    */
     public void setEmpresa(Empresa empresa) {
         this.Empresa = empresa;
     }
 
+    /** (calcMin)
+    --------------------
+    Calcula las ciudades optimas.
+    --------------------
+    */
     private void calcMin(){
         if(!this.floydBool) this.floyd();
 
@@ -150,11 +220,23 @@ public class Pais implements Grafo {
         }
     }
 
+    /** (ciudadesOptimas)
+    --------------------
+    Retorna una lista con las ciudades optimas.
+    --------------------
+    */
     public List<Integer> ciudadesOptimas() {
         if(this.minId.isEmpty()) this.calcMin();
         return this.minId;
     }
 
+    /** (getUtilidad)
+    (int) (src)
+    (int) (dest)
+    --------------------
+    Obtiene la utilidad desde un nodo de origen src hasta el nodo destino dest.
+    --------------------
+    */
     public int getUtilidad(int src, int dest) {
         Ciudad ciudad = this.Ciudades[dest];
 
@@ -167,11 +249,23 @@ public class Pais implements Grafo {
         return precioBalon*consumoCasas + precioLitro*consumoEdificios- this.cost[src][dest];
     }
 
+    /** (getnCamiones)
+    (int) (i)
+    --------------------
+    Obtiene el numero de camiones.
+    --------------------
+    */
     public int getnCamiones(int i){
         Ciudad ciudad = this.Ciudades[i];
         return ciudad.getnEdificios();
     }
 
+    /** (getnCamionetas)
+    (int) (i)
+    --------------------
+    Obtiene el numero de camionetas.
+    --------------------
+    */
     public int getnCamionetas(int i){
         Ciudad ciudad = this.Ciudades[i];
         return (ciudad.getnCasas() > 0)? 1 : 0;

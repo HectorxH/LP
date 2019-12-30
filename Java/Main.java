@@ -47,8 +47,8 @@ class Main {
         }
     }
 
-    /** mapa
-    Empresa emp
+    /** (mapa)
+    (Empresa) (emp)
     --------------------
     Recibe una empresa y extrae del archivo de texto mapa.txt las ciudades y caminos. Crea un pais con
     estos datos.
@@ -72,7 +72,7 @@ class Main {
         return p;
     }
 
-    /** empresa
+    /** (empresa)
     --------------------
     Extrae del archivo de texto empresa.txt el precio de balon de gas, litro de gas y costo por kilometro
     de transporte y retorna una Empresa.
@@ -90,10 +90,10 @@ class Main {
         return new Empresa(balonGas, litroGas, kilometros);
     }
 
-    /** edificaciones
-    Pais p
+    /** (edificaciones)
+    (Pais) (p)
     --------------------
-    Extrae del archivo de texto edificaciones.txt 
+    Extrae del archivo de texto edificaciones.txt las edificaciones de cada ciudad junto con su consumo y crea sus respectuvas ciudades.
     */
     private static void edificaciones(Pais p) throws FileNotFoundException{
         File file = new File("edificaciones.txt");
