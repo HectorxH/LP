@@ -78,7 +78,7 @@ class TetrisGame:
 
     def make_fonts(self):
         font = "joystix monospace.ttf"
-        
+
         create_font = lambda size: pygame.font.Font(
             font, floor(self.cell_size*size),
             bold=False,
@@ -354,13 +354,18 @@ class TetrisGame:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         input_field.up()
+                        pygame.mixer.Sound.play(self.sounds["move"])
                     elif event.key == pygame.K_DOWN:
                         input_field.down()
+                        pygame.mixer.Sound.play(self.sounds["move"])
                     elif event.key == pygame.K_LEFT:
                         input_field.move_left()
+                        pygame.mixer.Sound.play(self.sounds["move"])
                     elif event.key == pygame.K_RIGHT:
                         input_field.move_right()
-                    elif event.key in (pygame.K_SPACE, pygame.K_INSERT, pygame.K_ESCAPE):
+                        pygame.mixer.Sound.play(self.sounds["move"])
+                    elif event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_ESCAPE):
+                        pygame.mixer.Sound.play(self.sounds["triple"])
                         no_name = False
             
         with open('scores.txt', 'a') as file:
