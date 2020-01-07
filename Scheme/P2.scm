@@ -6,8 +6,8 @@
 (define (xor x y) (not (eqv? x y)))
 
 ;; (mayme listadelistas min)
-;; 
-;; 
+;; Si min es #t revisa si la lista tiene la suma minima, si min es #f revisa si la suma es maxima.
+;; Retorna el nombre de la lista que tenga la suma minima o maxima.
 (define (mayme listadelistas min)
   (let mayme_aux ((lista listadelistas) (id1 (caar listadelistas)) (val1 (apply + (cdar listadelistas))))
     (if (null? lista) id1
