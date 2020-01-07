@@ -9,6 +9,7 @@ import estructuras.Ciudad;
 
 class Main {
     public static void main(String[] args) throws FileNotFoundException{
+
         Empresa emp = empresa();
         Pais p = mapa(emp);
         edificaciones(p);
@@ -51,7 +52,7 @@ class Main {
     (Empresa) (emp)
     --------------------
     Recibe una empresa y extrae del archivo de texto mapa.txt las ciudades y caminos. Crea un pais con
-    estos datos.
+    estos datos y lo retorna.
     */
     private static Pais mapa(Empresa emp) throws FileNotFoundException{
         File file = new File("mapa.txt");
@@ -75,7 +76,7 @@ class Main {
     /** (empresa)
     --------------------
     Extrae del archivo de texto empresa.txt el precio de balon de gas, litro de gas y costo por kilometro
-    de transporte y retorna una Empresa.
+    de transporte y retorna una Empresa con estos datos.
     */
     private static Empresa empresa() throws FileNotFoundException{
         File file = new File("empresa.txt");
