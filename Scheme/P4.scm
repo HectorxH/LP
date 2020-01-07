@@ -3,26 +3,20 @@
 ;; (ordenado? lista)
 ;; Recibe una lista y revisa si esta ordenada de menor a mayor.
 ;; Retorna #t si la lista esta ordenada de menor a mayor y #f si no lo esta.
-(define ordenado?
-  (lambda (lista)
-    (if (null? (cdr lista))
-        #t
-        (if (< (car lista) (cadr lista))
-            (ordenado? (cdr lista))
-            #f
-            )
-        )
-    )
+(define (ordenado? lista)
+  (if (null? (cdr lista))
+      #t
+      (if (< (car lista) (cadr lista))
+          (ordenado? (cdr lista))
+          #f
+          )
+      )
   )
 
 ;; (check_columns matriz)
 ;; Recibe una matriz y busca si hay una columna ordenada de menor a mayor.
 ;; Retorna #t si la matriz tiene una columna ordenada de menor a mayor.
-(define check_columns
-  (lambda (matriz)
-    (ormap ordenado? matriz)
-    )
-  )
+(define (check_columns matriz) (ormap ordenado? matriz))
 
 ;; (check_rows matriz)
 ;; Recibe una matriz y busca si hay una fila ordenada de menor a mayor. 
