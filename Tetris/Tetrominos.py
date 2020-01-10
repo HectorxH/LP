@@ -29,9 +29,6 @@ class Tetromino(ABC):
     def set_pos(self, pos):
         self.pos = pos
 
-    def get_width(self):
-        return self.width
-
     def rotate_cw(self):
         self.shape = list(map(list, list(zip(*self.shape[::-1]))))
         self.width, self.hight = self.hight, self.width
@@ -47,6 +44,19 @@ class Tetromino(ABC):
         self.__init__()
 
     def draw_at(self, screen, cell_size, pos, scale):
+        """
+        Dibuja el tetromino en una posicion especifica de la pantalla.
+
+        Argumentos:
+            screen (superficie de pygame): Pantalla del juego.
+            cell_size (entero): Ancho de un cuadrado de la pantalla en pixeles.
+            pos (par): Posicion donde se quiere dibujar.
+            scale (entero): Factor que escala el tamaño del tetromino mostrado en pantalla.
+
+        Retorno:
+            No retorna.
+        """
+
         x, y = pos
         for off_y, row in enumerate(self.shape):
             for off_x, _ in filter(lambda x: x[1], enumerate(row)):
@@ -56,6 +66,18 @@ class Tetromino(ABC):
                 pygame.draw.rect(screen, self.color, r)
 
     def draw_ghost(self, screen, cell_size, pos):
+        """
+        Dibuja la sombra del tetromino, donde deberia caer.
+
+        Argumentos:
+            screen (superficie de pygame): Pantalla del juego.
+            cell_size (entero): Ancho de un cuadrado de la pantalla en pixeles.
+            pos (par): Posicion donde se quiere dibujar.
+
+        Retorno:
+            No retorna.
+        """
+
         x, y = pos
         # x, y = ((SIDE+x-first_row)*CELL_SIZE,(y-first_col)*CELL_SIZE)
         color = tuple(map(lambda x: floor(x/3), self.color))
@@ -67,6 +89,17 @@ class Tetromino(ABC):
                 pygame.draw.rect(screen, color, r)
 
     def draw(self, screen, cell_size):
+         """
+        Dibuja el tetromino en la pantalla.
+
+        Argumentos:
+            screen (superficie de pygame): Pantalla del juego.
+            cell_size (entero): Ancho de un cuadrado de la pantalla en pixeles.
+
+        Retorno:
+            No retorna.
+        """
+
         first_row, first_col = 3, 5
         x, y = self.pos
         x, y = ((SIDE+x-first_row)*cell_size, (y-first_col)*cell_size)
@@ -152,6 +185,19 @@ class I(Tetromino):
         self.name = 'I'
 
     def draw_at(self, screen, cell_size, pos, scale):
+        """
+        Dibuja el tetromino en una posicion especifica de la pantalla y la ajusta ya que su tamaño es distinto.
+
+        Argumentos:
+            screen (superficie de pygame): Pantalla del juego.
+            cell_size (entero): Ancho de un cuadrado de la pantalla en pixeles.
+            pos (par): Posicion donde se quiere dibujar.
+            scale (entero): Factor que escala el tamaño del tetromino mostrado en pantalla.
+
+        Retorno:
+            No retorna.
+        """
+
         scale = scale*0.9
         x, y = pos
         shape = self.shape[1:]

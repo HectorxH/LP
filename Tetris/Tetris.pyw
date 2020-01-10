@@ -77,6 +77,13 @@ class TetrisGame:
 
 
     def make_fonts(self):
+        """
+        Crea los distintos tipos de fuentes para el tamaño de la pantalla actual.
+
+        Retorno:
+            No retorna.
+        """
+
         font = "joystix monospace.ttf"
 
         create_font = lambda size: pygame.font.Font(
@@ -91,11 +98,25 @@ class TetrisGame:
         self.big_font = create_font(base+0.3)
 
     def new_bag(self):
+        """
+        Ordena de manera aleatoria los siguientes 7 tetrominos que el jugador obtendra.
+
+        Retorno:
+            Retorna una bolsa.
+        """
+
         bag = [shape() for shape in shapes]
         shuffle(bag)
         return bag
 
     def new_tetromino(self):
+        """
+        Crea un nuevo tetromino, lo a;ade al tablero y si se vacia la bolsa, crea una nueva.
+
+        Retorno:
+            No retorna.
+        """
+
         if len(self.bag) == 7:
             self.bag = self.bag+self.new_bag()
         self.tetromino = self.bag.pop(0)
@@ -104,6 +125,13 @@ class TetrisGame:
 
 
     def init_game(self):
+        """
+        Inicia un nuevo juego.
+
+        Retorno:
+            No retorna.
+        """
+
         self.board = Board()
 
         self.bag = self.new_bag() + self.new_bag()
@@ -145,6 +173,13 @@ class TetrisGame:
         pygame.mixer.music.set_volume(self.volume)
 
     def draw_next(self):
+        """
+        Dibuja los siguientes tetrominos.
+
+        Retorno:
+            No retorna.
+        """
+
         offset = floor(self.cell_size/2)
         self.display_text("Next:", (self.side+self.cell_size, 0))
 
@@ -159,11 +194,25 @@ class TetrisGame:
                 0.4)
 
     def draw_hold(self):
+        """
+        Dibuja el tetrimonio que esta en hold.
+
+        Retorno:
+            No retorna.
+        """
+
         self.display_text("Hold:", (self.cell_size*0.1, self.cell_size*0.1))
         if self.holding:
             self.hold.draw_at(self.screen, self.cell_size, (self.cell_size, self.cell_size*2), 1.1)
 
     def draw_stats(self):
+        """
+        Muestra la informacion de las estadisticas.
+
+        Retorno:
+            No retorna.
+        """
+
         x, y = 0.1, 10
         print_stat = lambda offset, k: self.display_smoll_text(
             "{}: {}".format(k, self.stats[k]),
@@ -172,6 +221,13 @@ class TetrisGame:
             print_stat(i, k)
 
     def draw_splash_text(self):
+        """
+        Se asegura de que los mensajes de bonificacion aparezcan en pantalla por un tiempo.
+
+        Retorno:
+            No retorna.
+        """
+
         for i, info in enumerate(self.text):
             f, time_left = info
             if time_left <= 0:
@@ -181,15 +237,57 @@ class TetrisGame:
             f()
 
     def display_text(self, string, pos):
+        """
+        Muestra en pantalla el texto string en la posicion pos con la fuente por defecto.
+        
+        Argumentos:
+            string (string): Texto que se quiere mostrar.
+            pos (par): Posicion donde se mostrara el texto.
+
+        Retorno:
+            No retorna.
+        """
+
         self.screen.blit(self.default_font.render(string, False, (255, 255, 255), DETAIL), pos)
 
     def display_smoll_text(self, string, pos):
+        """
+        Muestra en pantalla el texto string en la posicion pos con la fuente por defecto pero en tamaño pequeño.
+        
+        Argumentos:
+            string (string): Texto que se quiere mostrar.
+            pos (par): Posicion donde se mostrara el texto.
+
+        Retorno:
+            No retorna.
+        """
+
         self.screen.blit(self.small_font.render(string, False, (255, 255, 255), DETAIL), pos)
 
     def display_big_text(self, string, pos):
+        """
+        Muestra en pantalla el texto string en la posicion pos con la fuente por defecto pero en tamaño grande.
+
+        Argumentos:
+            string (string): Texto que se quiere mostrar.
+            pos (par): Posicion donde se mostrara el texto.
+        Retorno:
+            No retorna.
+        """
         self.screen.blit(self.big_font.render(string, False, (255, 255, 255), DETAIL), pos)
 
     def splash_text(self, string, y):
+        """
+        Crea los splash text.
+
+        Argumentos:
+            string (string): Texto que se quiere mostrar.
+            y (int):
+
+        Retorno:
+            No retorna.
+        """
+
         text = self.big_font.render(string, False, (255, 255, 255), (0, 0, 0, 255))
         text_rect = text.get_rect(center=((self.cell_size/2)*(COLS+2*SIDE), y*self.cell_size))
         return lambda:self.screen.blit(text, text_rect)
