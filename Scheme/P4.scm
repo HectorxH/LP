@@ -33,8 +33,8 @@
   )
 
 ;; (check_diagonal matriz)
-;; Recibe una matriz y busca si hay una diagonal ordenada de menor a mayor.
-;; Retorna #t si la matriz tiene una diagonal ordenada de menor a mayor.
+;; Recibe una matriz y busca si la diagonal esta ordenada de menor a mayor.
+;; Retorna #t si la matriz tiene su diagonal ordenada de menor a mayor.
 (define check_diagonal
  (lambda (matriz)
     (if (null? (cdr matriz))

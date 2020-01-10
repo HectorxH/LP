@@ -15,7 +15,7 @@
 
 ;; (in i lista)
 ;; Revisa si un nodo esta en una lista de vecinos.
-;; Retorna #t si es que esta y #f si es que no.
+;; Retorna #t si es que esta el nodo en la lista y #f en caso contrario.
 (define (in i lista)
   (if (null? lista)
       #f
