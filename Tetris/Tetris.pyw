@@ -102,7 +102,7 @@ class TetrisGame:
         Ordena de manera aleatoria los siguientes 7 tetrominos que el jugador obtendra.
 
         Retorno:
-            Retorna una bolsa.
+            Retorna la bolsa.
         """
 
         bag = [shape() for shape in shapes]
@@ -271,6 +271,7 @@ class TetrisGame:
         Argumentos:
             string (string): Texto que se quiere mostrar.
             pos (par): Posicion donde se mostrara el texto.
+
         Retorno:
             No retorna.
         """
@@ -282,10 +283,10 @@ class TetrisGame:
 
         Argumentos:
             string (string): Texto que se quiere mostrar.
-            y (int):
+            y (int): Funcion que imprime el texto entregado a la funcion.
 
         Retorno:
-            No retorna.
+            Retorna una funcion.
         """
 
         text = self.big_font.render(string, False, (255, 255, 255), (0, 0, 0, 255))
@@ -293,6 +294,17 @@ class TetrisGame:
         return lambda:self.screen.blit(text, text_rect)
 
     def tspin(self, x, b2b=False):
+        """
+        Muestra los mensajes de T-Spin.
+
+        Argumentos:
+            x (int): Cantidad de lineas que se limpiaron con el T-Spin.
+            b2b (boolean): Es True si las ultimas lineas se limpiaron con un T-Spin y False en caso contrario.
+
+        Retorno:
+            No retorna.
+        """
+
         if x == 0:
             string = "T-Spin"
         elif x == 1:
@@ -307,14 +319,48 @@ class TetrisGame:
         self.text.append((self.splash_text(string, 4), TEXT_DURATION))
 
     def combo_count(self, combo):
+        """
+        Muestra el combo actual.
+
+        Argumentos:
+            combo (int): Cantidad de combos que ha realizado el jugador hasta el momento
+
+        Retorno:
+            No retorna.
+        """
+
         self.text.append((self.splash_text("x{}!".format(combo), 6), TEXT_DURATION))
 
     def tetris(self, b2b=False):
+        """
+        Muestra los mensajes de Tetris.
+
+        Argumentos:
+            b2b (boolean): 
+
+        Retorno:
+            No retorna.
+        """
+
         if b2b:
             self.text.append((self.splash_text("Back 2 Back!", 2), TEXT_DURATION))
         self.text.append((self.splash_text("Tetris!", 4), TEXT_DURATION))
 
     def score_lines(self, lines, isTspin):
+        """
+        Actualiza el puntaje actual y muestra en pantalla los textos de jugadas especiales.
+
+        Dada la cantidad de lineas que se limpiaron y si la jugada fue un T-Spin o Tetris, actualiza
+        el puntaje actual y muestra en pantalla los textos de jugadas especiales si es necesario.
+
+        Argumentos:
+            lines (int): Cantidad de lineas que se limpiaron.
+            isTspin (boolean): Es True si la jugada fue un T-Spin y False si es que no.
+
+        Retorno:
+            No retorna.
+        """
+
         if lines == 0:
             self.stats["Combo"] = 0
         else:
@@ -348,11 +394,32 @@ class TetrisGame:
             self.b2b_tspin = isTspin
 
     def move(self, direction):
+        """
+        Se encarga del movimiento horizontal del tetromino.
+
+        Argumentos:
+            direction (int): Direccion en la que se movera el tetromino.
+
+        Retorno:
+            No retorna.
+        """
+
         if not self.gameover and not self.paused:
             if self.board.move(direction):
                 pygame.mixer.Sound.play(self.sounds["move"])
 
     def resize(self, w, h):
+        """
+        Modifica el tamaño de la pantalla.
+
+        Argumentos:
+            w (int): Cantidad de pixeles para el ancho.
+            h (int): Cantidad de pixeles para el alto.
+
+        Retorno:
+            No retorna.
+        """
+
         w, h = w-w%COLS, h-h%ROWS
         w, h = max(w, h), min(w, h)
         self.dimensions = (w, h)
@@ -363,9 +430,23 @@ class TetrisGame:
         self.make_fonts()
 
     def quit(self):
+        """
+        Permite salir del juego.
+
+        Retorno:
+            No retorna.
+        """
+
         sys.exit()
 
     def swap_hold(self):
+        """
+        Intercambia el tetromino actual con el guardado en hold.
+
+        Retorno:
+            No retorna.
+        """
+
         if not self.gameover and not self.paused and not self.did_swap:
             pygame.mixer.Sound.play(self.sounds["swap"])
             if not self.holding:
@@ -379,6 +460,17 @@ class TetrisGame:
             self.did_swap = True
 
     def update_piece(self, lines, isTspin):
+        """
+        Cuando un tetromino choca con una pieza, saca un nuevo tetromino de la bolsa y calcula el puntaje.
+
+        Argumentos:
+            lines (int): Cantidad de lineas que se limpiaron.
+            isTspin (boolean): Es True si la jugada fue un T-Spin y False si es que no.
+
+        Retorno:
+            No retorna.
+        """
+
         if lines == 4:
             if self.b2b_tetris:
                 pygame.mixer.Sound.play(self.sounds["b2b tetris"])
@@ -392,6 +484,16 @@ class TetrisGame:
         self.did_swap = False
 
     def drop(self, soft=False):
+        """
+        Hace que el tetromino caiga.
+
+        Argumentos:
+            soft (boolean): Si es True el tetromino baja mas rapido.
+
+        Retorno:
+            No retorna.
+        """
+
         if not self.gameover and not self.paused:
             if soft and self.tetromino.score < 20:
                 self.stats["Score"] += 1
@@ -401,6 +503,13 @@ class TetrisGame:
                 self.update_piece(lines, isTspin)
 
     def hard_drop(self):
+        """
+        Hace que el tetromino caiga de una vez.
+
+        Retorno:
+            No retorna.
+        """
+
         if not self.gameover and not self.paused:
             pygame.mixer.Sound.play(self.sounds["hard drop"])
             self.stats["Score"] += 40
@@ -410,11 +519,28 @@ class TetrisGame:
             self.update_piece(lines, isTspin)
 
     def rotate(self, direction):
+        """
+        Rota el tetromino actual en 90°.
+
+        Argumentos:
+            direction (int): Direccion en la que se rotara el tetromino.
+
+        Retorno:
+            No retorna.
+        """
+
         if not self.gameover and not self.paused:
             pygame.mixer.Sound.play(self.sounds["rotate"])
             self.board.rotate(direction)
 
     def pause(self):
+        """
+        Detiene el juego momentaneamente.
+
+        Retorno:
+            No retorna.
+        """
+
         self.display_big_text("HIGH SCORES:", (self.cell_size*(SIDE+1), self.cell_size*(2)))
         
         for i, info in enumerate(self.top10):
@@ -425,6 +551,13 @@ class TetrisGame:
                  (self.cell_size*(SIDE+1), self.cell_size*(4+i)))
         
     def restart(self):
+        """
+        Comienza un nuevo juego y actualiza High Scores.
+
+        Retorno:
+            No retorna.
+        """
+
         no_name = True
         input_field = InputBox()
         while no_name:
@@ -471,6 +604,13 @@ class TetrisGame:
         self.init_game()
 
     def loop(self):
+        """
+        Loop principal del juego.
+
+        Retorno:
+            No retorna.
+        """
+
         clock = pygame.time.Clock()
         moveTick = 0
         moveAccel = 0
