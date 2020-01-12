@@ -348,10 +348,10 @@ class TetrisGame:
 
     def score_lines(self, lines, isTspin):
         """
-        Actualiza el puntaje actual y muestra en pantalla los textos de jugadas especiales.
+        Actualiza el puntaje y muestra en pantalla los textos de jugadas especiales.
 
         Dada la cantidad de lineas que se limpiaron y si la jugada fue un T-Spin o Tetris, actualiza
-        el puntaje actual y muestra en pantalla los textos de jugadas especiales si es necesario.
+        el puntaje y muestra en pantalla los textos de jugadas especiales si es necesario.
 
         Argumentos:
             lines (int): Cantidad de lineas que se limpiaron.
@@ -441,7 +441,7 @@ class TetrisGame:
 
     def swap_hold(self):
         """
-        Intercambia el tetromino actual con el guardado en hold.
+        Intercambia el tetromino activo con el guardado en hold.
 
         Retorno:
             No retorna.
@@ -488,7 +488,7 @@ class TetrisGame:
         Hace que el tetromino caiga.
 
         Argumentos:
-            soft (boolean): Si es True el tetromino baja mas rapido.
+            soft (boolean): Es True si el jugador baja la pieza y es False si no.
 
         Retorno:
             No retorna.
@@ -520,7 +520,7 @@ class TetrisGame:
 
     def rotate(self, direction):
         """
-        Rota el tetromino actual en 90°.
+        Rota el tetromino activo en 90°.
 
         Argumentos:
             direction (int): Direccion en la que se rotara el tetromino.
