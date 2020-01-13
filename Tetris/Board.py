@@ -123,7 +123,7 @@ class Board:
             return count > 2 and not self.tetromino.wall_kick and self.tetromino.last_rotate
         return False
 
-    def drop(self, delay, soft=False, hard=False):
+    def drop(self, delay, manual=False, hard=False):
         """
         Baja el tetromino activo una casilla.
 
@@ -132,7 +132,7 @@ class Board:
 
         Argumentos:
             delay (int): Tiempo que espera antes de volver a bajar la pieza.
-            soft (boolean): Es True si el jugador baja la pieza y es False si no.
+            soft (boolean): Es True si el jugador baja manualmente la pieza y es False si no.
             hard (boolean): Es True si el jugador realiza un hard drop y es False si no.
 
         Retorno:
@@ -149,7 +149,7 @@ class Board:
             self.tetromino.lock_delay -= 1
 
         isTspin = False
-        if self.clock % delay == 0 or soft:
+        if self.clock % delay == 0 or manual:
             if not self.active_tetromino:
                 return -2, isTspin
             if willCollide and (self.tetromino.lock_delay <= 0 or hard):

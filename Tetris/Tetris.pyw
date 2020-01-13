@@ -217,8 +217,9 @@ class TetrisGame:
         print_stat = lambda offset, k: self.display_smoll_text(
             "{}: {}".format(k, self.stats[k]),
             (1+self.side+self.cell_size*x, self.cell_size*(y+offset)))
-        for i, k in enumerate(self.stats):
-            print_stat(i, k)
+        
+        for pos, stat in enumerate(self.stats):
+            print_stat(pos, stat)
 
     def draw_splash_text(self):
         """
