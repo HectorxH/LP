@@ -1,13 +1,18 @@
-import sys
-from math import floor
-from random import shuffle
-import heapq as pq
+try:
+    import pygame
+except:
+    raise ImportError("No se a encontrado pygame en los modulos instalados.")
 
-import pygame
-
-from Board import Board
-from constants import *
-from Tetrominos import Tetromino, shapes
+try:
+    import sys
+    from math import floor
+    from random import shuffle
+    import heapq as pq
+    from Board import Board
+    from constants import *
+    from Tetrominos import Tetromino, shapes
+except ImportError as err:
+    raise ImportError("Error al cargar modulos: {}".format(err))
 
 class InputBox:
     """
@@ -55,27 +60,31 @@ class TetrisGame:
 
         self.make_fonts()
 
-        icon_surf = pygame.image.load("Tetris.png")
-        pygame.display.set_icon(icon_surf)
+        try:
+            icon_surf = pygame.image.load("Tetris.png")
+            pygame.display.set_caption("Tetris!")
+            pygame.mixer.music.load("Tetris.ogg")
+
+            self.sounds = {}
+            self.sounds["lock"] = pygame.mixer.Sound("sfx/lock.wav")
+            self.sounds["hard drop"] = pygame.mixer.Sound("sfx/hard_drop.wav")
+            self.sounds["swap"] = pygame.mixer.Sound("sfx/swap.wav")
+            self.sounds["move"] = pygame.mixer.Sound("sfx/move.wav")
+            self.sounds["rotate"] = pygame.mixer.Sound("sfx/rotate.wav")
+            self.sounds["single"] = pygame.mixer.Sound("sfx/single.wav")
+            self.sounds["double"] = pygame.mixer.Sound("sfx/double.wav")
+            self.sounds["triple"] = pygame.mixer.Sound("sfx/triple.wav")
+            self.sounds["tetris"] = pygame.mixer.Sound("sfx/tetris.wav")
+            self.sounds["b2b tetris"] = pygame.mixer.Sound("sfx/b2b_tetris.wav")
+        except pygame.error as msg:
+            raise pygame.error("Error al cargar recursos.".format(msg))
+
+
         self.screen = pygame.surface.Surface(self.dimensions)
         self.window = pygame.display.set_mode(self.dimensions, pygame.RESIZABLE)
         self.window.fill(DETAIL)
-        pygame.display.set_caption("Tetris!")
 
-        pygame.mixer.music.load("Tetris.ogg")
-
-        self.sounds = {}
-        self.sounds["lock"] = pygame.mixer.Sound("sfx/lock.wav")
-        self.sounds["hard drop"] = pygame.mixer.Sound("sfx/hard_drop.wav")
-        self.sounds["swap"] = pygame.mixer.Sound("sfx/swap.wav")
-        self.sounds["move"] = pygame.mixer.Sound("sfx/move.wav")
-        self.sounds["rotate"] = pygame.mixer.Sound("sfx/rotate.wav")
-        self.sounds["single"] = pygame.mixer.Sound("sfx/single.wav")
-        self.sounds["double"] = pygame.mixer.Sound("sfx/double.wav")
-        self.sounds["triple"] = pygame.mixer.Sound("sfx/triple.wav")
-        self.sounds["tetris"] = pygame.mixer.Sound("sfx/tetris.wav")
-        self.sounds["b2b tetris"] = pygame.mixer.Sound("sfx/b2b_tetris.wav")
-
+        pygame.display.set_icon(icon_surf)
         self.init_game()
 
 
@@ -88,6 +97,14 @@ class TetrisGame:
         """
 
         font = "joystix monospace.ttf"
+        try:
+            file = open(font, 'r')
+            file.close()
+        except IOError:
+            print("""La fuente {} no fue encontrada en la carpeta del juego,
+             se utilizara la fuente por defecto.""".format(font))
+            font = pygame.font.get_default_font()
+
 
         create_font = lambda size: pygame.font.Font(
             font, floor(self.cell_size*size),
@@ -164,6 +181,7 @@ class TetrisGame:
 
         scores = []
         self.top10 = []
+
         with open("scores.txt", 'r+') as file:
             for line in file:
                 score, name = line.strip().split(', ')
