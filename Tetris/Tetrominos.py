@@ -89,7 +89,7 @@ class Tetromino(ABC):
                 pygame.draw.rect(screen, color, r)
 
     def draw(self, screen, cell_size):
-         """
+        """
         Dibuja el tetromino en la pantalla.
 
         Argumentos:
