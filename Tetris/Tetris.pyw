@@ -10,6 +10,9 @@ from constants import *
 from Tetrominos import Tetromino, shapes
 
 class InputBox:
+    """
+    Casilla donde se ingresa el texto para agregar un High Score.
+    """
     abc = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
     def __init__(self):
