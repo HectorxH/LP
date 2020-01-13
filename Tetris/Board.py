@@ -158,7 +158,7 @@ class Board:
                 for off_y, row in enumerate(shape):
                     for off_x, _ in filter(lambda x: x[1], enumerate(row)):
                         self.matrix[y+off_y][x+off_x] = self.tetromino.get_color()
-                        self.active_tetromino = False
+                self.active_tetromino = False
                 lines = 0
                 for i, row in list(enumerate(self.matrix[:-2])):
                     if not BACKGROUND in row:
