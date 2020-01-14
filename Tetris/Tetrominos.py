@@ -1,7 +1,14 @@
-from abc import ABC
-from math import floor
-import pygame
-from constants import BLOCK_SIZE, COLS, SIDE
+try:
+    import pygame
+except:
+    raise ImportError("No se a encontrado pygame en los modulos instalados.")
+    
+try:
+    from abc import ABC
+    from math import floor
+    from constants import BLOCK_SIZE, COLS, SIDE
+except ImportError as err:
+    raise ImportError("Error al cargar modulos: {}".format(err))
 
 class Tetromino(ABC):
     DELAY = 4
