@@ -10,3 +10,6 @@ Arriba: Rotar en sentido horario.w
 Z: Rotar en sentido anti-horario.
 X: Rotar en sentido horario.
 C: Hold.
+Esc: Pausa.
+R: Restart.
+Q: Salir.
